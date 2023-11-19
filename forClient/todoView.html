@@ -1,0 +1,120 @@
+<html><head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <script type="text/javascript" src="https://unpkg.com/vue@next"></script>
+  </head>
+  
+  <body >
+  <hr />
+  <div id="main">
+  <div id="list" v-if="UI=='main'">
+    <h1>This is the main page.</h1>
+    <button @click="setUI('checkCart')">查看購物車</button>
+    <table border=1>
+      <tr><td>序號</td><td>商品名稱</td><td>商品介紹</td><td>商品價格</td><td>-</td></tr>
+      <!-- array : dat -->
+      <tr v-for="product in dat"> 
+        <td>{{product.id}}</td>
+        <td>{{product.name}}</td>
+        <td>{{product.illustrate}}</td>
+        <td>{{product.price}}</td>
+        <td><button @click="confirmAddToCart(product.id)">加入購物車</button></td>
+      </tr>
+    </table>
+  </div>
+  <div v-if="UI=='checkCart'">
+    <table border=1>
+      <tr><td>序號</td><td>商品名稱</td><td>商品價格</td><td>-</td></tr>
+      <!-- array : dat -->
+      <tr v-for="item in cart"> 
+        <td>{{item.id}}</td>
+        <td>{{item.name}}</td>
+        <td>{{item.price}}</td>
+        <td><button @click="delCart(product.id)">刪除</button></td>
+      </tr>
+    </table>
+    <button @click="setUI('main')">返回商品介面</button>
+  </div>
+  </div>
+  <script>
+  const todoApp= Vue.createApp({ //宣告 利用物件裡的createApp
+    data() { //在app裡定義資料結構為data
+      return { //回傳以下物件
+        UI: 'main',
+        dat: [],
+        cart: [],
+        newProduxt: {
+          id: -1,
+          name: '',
+          illustrate: '',
+          price: ''
+        }
+      }
+    },
+    methods: {
+      loadList: function () {
+        const that=this; //this  ==> stands for vm6. let's save `this` to `that`
+        fetch('todoControl.php?act=listProduct')
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(myJson) {
+          //we are inside the callback function, now `this` means the function, not vm6
+          //we will use `that` to access vm6
+          //this.dat = myJson;
+          that.dat = myJson;
+          //vm6.dat = myJson;
+        });
+      },
+      checkCart: function () {
+        const that=this; //this  ==> stands for vm6. let's save `this` to `that`
+        fetch('todoControl.php?act=checkProduct')
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(myJson) {
+          //we are inside the callback function, now `this` means the function, not vm6
+          //we will use `that` to access vm6
+          //this.dat = myJson;
+          console.log(myJson);
+          that.cart = myJson;
+          //vm6.dat = myJson;
+        });
+      },
+      confirmAddToCart(id) {
+      // 使用 confirm 函數彈出確認對話框
+      const isConfirmed = window.confirm('確定要將商品加入購物車嗎？');
+
+      // 如果用戶按下確認，執行加入購物車的相應邏輯
+      if (isConfirmed) {
+        this.addCart(id);
+      }
+    },
+      addCart: function (id) {
+        const that=this;
+        let mydat = new FormData();
+        mydat.append( "dat", JSON.stringify(this.newProduct) );
+  
+        let url="todoControl.php?act=addCart&id="+id;
+        fetch(url,{
+          method: 'POST',
+          body: mydat // 將表單物件放入fetch的body屬性
+        })
+        .then(function(res){return res.text(); }) //取得傳回值，轉為文字
+        .then(function(data){ 
+          console.log(data);
+          that.setUI('main');
+          that.loadList();
+        })
+      },
+      setUI: function(page) { //把vue裡面的變數設成自己指定的值
+        this.UI=page;
+      }
+    },
+    created() {
+      this.loadList();
+      this.checkCart();
+    }
+  }).mount("#main");
+  
+  </script>
+  </body></html>
