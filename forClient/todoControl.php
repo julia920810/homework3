@@ -8,9 +8,18 @@ case "listProduct":
   echo json_encode($product);
   return;  
 case "addCart":
-	$id=(int)$_REQUEST['id'];
-	//should verify first
-	addCart($id);
+	// echo $id;
+	$id = isset($_REQUEST['id']) ? (int)$_REQUEST['id'] : 0;
+	$quantity = isset($_REQUEST['quantity']) ? (int)$_REQUEST['quantity'] : 0;
+    // Verify the ID before proceeding
+	if ($id > 0 && $quantity > 0) {
+		addCart($id, $quantity);
+	}
+    return;
+case "delCart":
+	$id=(int)$_REQUEST['id']; //$_GET, $_REQUEST
+	//verify
+	delCart($id);
 	return;
 case "checkProduct":
 	$item=getCartList();

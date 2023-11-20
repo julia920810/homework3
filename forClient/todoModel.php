@@ -27,15 +27,26 @@ function getCartList() {
 	}
 	return $rows;
 }
-function addCart($id) {
+
+// function addCart($id) {
+// 	global $db;
+
+// 	$sql = "INSERT INTO cart (id, name, price) SELECT id, name, price FROM commodity WHERE id = ?"; //SQL中的 ? 代表未來要用變數綁定進去的地方
+// 	$stmt = mysqli_prepare($db, $sql); //prepare sql statement
+// 	mysqli_stmt_bind_param($stmt, "isi", $id,$name,$price); //bind parameters with variables, with types "sss":string, string ,string
+// 	mysqli_stmt_execute($stmt);  //執行SQL
+// 	return True;
+// }
+
+function addCart($id, $quantity) {
     global $db;
 
     // Assuming $name and $price are obtained from the commodity table
-    $sql = "INSERT INTO cart (id, name, price) SELECT id, name, price FROM commodity WHERE id = ?";
+    $sql = "INSERT INTO cart (id, name, price, quantity) SELECT id, name, price, ? FROM commodity WHERE id = ?";
     $stmt = mysqli_prepare($db, $sql);
 
-    // Bind the parameter
-    mysqli_stmt_bind_param($stmt, "i", $id);
+    // Bind the parameters
+    mysqli_stmt_bind_param($stmt, "ii", $quantity, $id);
 
     // Execute the statement
     $result = mysqli_stmt_execute($stmt);
@@ -47,5 +58,21 @@ function addCart($id) {
         // You can add error handling here if needed
         return false;
     }
+}
+
+
+// function updateJob($id, $jobName,$jobUrgent,$jobContent) {
+// 	echo $id, $jobName,$jobUrgent,$jobContent;
+// 	return;
+// }
+
+function delCart($id) {
+	global $db;
+
+	$sql = "delete from cart where id=?;"; //SQL中的 ? 代表未來要用變數綁定進去的地方
+	$stmt = mysqli_prepare($db, $sql); //prepare sql statement
+	mysqli_stmt_bind_param($stmt, "i", $id); //bind parameters with variables, with types "sss":string, string ,string
+	mysqli_stmt_execute($stmt);  //執行SQL
+	return True;
 }
 ?>
