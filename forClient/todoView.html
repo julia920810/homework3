@@ -15,7 +15,7 @@
     <h1>Product Viewing Interface</h1>
     <button @click="setUI('checkCart')">查看購物車</button>
     <table border=1>
-      <tr><td>序號</td><td>商品名稱</td><td>商品介紹</td><td>商品價格</td><td>商品數量</td><td>-</td></tr>
+      <tr><td>序號</td><td>商品名稱</td><td>商品說明</td><td>商品價格</td><td>商品數量</td><td>-</td></tr>
       <!-- array : dat -->
       <tr v-for="product in dat"> 
         <td>{{product.id}}</td>
@@ -38,6 +38,12 @@
         <td>{{item.price}}</td>
         <td>{{item.quantity}}</td>
         <td><button @click="confirmDelToCart(item.id)">刪除</button></td>
+      </tr>
+      <!-- 新增顯示總價的列 -->
+      <tr>
+        <td colspan="3"></td>
+        <td><strong>總價</strong></td>
+        <td>{{ calculateTotalPrice() }}</td>
       </tr>
     </table>
     <button @click="setUI('main')">返回商品介面</button>
@@ -87,6 +93,13 @@
           that.cart = myJson;
           //vm6.dat = myJson;
         });
+      },
+      calculateTotalPrice() {
+      let totalPrice = 0;
+      for (let i = 0; i < this.cart.length; i++) {
+        totalPrice += this.cart[i].price * this.cart[i].quantity;
+      }
+      return totalPrice;
       },
       delCart: function (id) {
         const that=this;
