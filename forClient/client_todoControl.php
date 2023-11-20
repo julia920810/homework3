@@ -1,5 +1,5 @@
 <?php
-require('todoModel.php');
+require('client_todoModel.php');
 
 $act=$_REQUEST['act'];
 switch ($act) {
