@@ -12,7 +12,7 @@
   <hr />
   <div id="main">
   <div id="list" v-if="UI=='main'">
-    <h1>This is the main page.</h1>
+    <h1>Product Viewing Interface</h1>
     <button @click="setUI('checkCart')">查看購物車</button>
     <table border=1>
       <tr><td>序號</td><td>商品名稱</td><td>商品介紹</td><td>商品價格</td><td>商品數量</td><td>-</td></tr>
@@ -98,6 +98,7 @@
         .then(function(data){
           console.log(data);
           that.loadList();
+          that.checkCart(); // Optionally, refresh the cart immediately
         })
       },
       confirmAddToCart(id, quantity) {

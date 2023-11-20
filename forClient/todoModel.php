@@ -42,14 +42,32 @@ function addCart($id, $quantity) {
     global $db;
 
     // Assuming $name and $price are obtained from the commodity table
-    $sql = "INSERT INTO cart (id, name, price, quantity) SELECT id, name, price, ? FROM commodity WHERE id = ?";
-    $stmt = mysqli_prepare($db, $sql);
+    // $sql = "INSERT INTO cart (id, name, price, quantity) SELECT id, name, price, ? FROM commodity WHERE id = ?";
+	$check_sql = "SELECT * FROM cart WHERE id = ?";
+    $check_stmt = mysqli_prepare($db, $check_sql);
+    mysqli_stmt_bind_param($check_stmt, "i", $id);
+    mysqli_stmt_execute($check_stmt);
+    $existing_item = mysqli_stmt_get_result($check_stmt)->fetch_assoc();
+
+    if ($existing_item) {
+        // Item already exists, update the quantity
+        $update_sql = "UPDATE cart SET quantity = quantity + ? WHERE id = ?";
+        $update_stmt = mysqli_prepare($db, $update_sql);
+        mysqli_stmt_bind_param($update_stmt, "ii", $quantity, $id);
+        $result = mysqli_stmt_execute($update_stmt);
+    } else {
+        // Item doesn't exist, insert a new row
+        $insert_sql = "INSERT INTO cart (id, name, price, quantity) SELECT id, name, price, ? FROM commodity WHERE id = ?";
+        $insert_stmt = mysqli_prepare($db, $insert_sql);
+        mysqli_stmt_bind_param($insert_stmt, "ii", $quantity, $id);
+        $result = mysqli_stmt_execute($insert_stmt);
+    }
 
     // Bind the parameters
-    mysqli_stmt_bind_param($stmt, "ii", $quantity, $id);
+    // mysqli_stmt_bind_param($stmt, "ii", $quantity, $id);
 
     // Execute the statement
-    $result = mysqli_stmt_execute($stmt);
+    // $result = mysqli_stmt_execute($stmt);
 
     // Check if the execution was successful
     if ($result) {
