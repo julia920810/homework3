@@ -1,5 +1,5 @@
 原先SourceTree Push上有問題，故在商品瀏覽介面的部分無法commit，
 以下內容為分工狀態：
 
-Product Viewing Interface -> 林國棟
+Product Viewing Interface -> 林國棟：loadList()大致架構, 梁心瑜：其他問題修正
 Shopping Cart Interface -> 梁心瑜
