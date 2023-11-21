@@ -1,0 +1,118 @@
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="https://unpkg.com/vue@next"></script>
+
+</head>
+
+<body >
+<hr />
+<div id = "main">
+<div id="list" v-if="UI=='main'">
+	<h1>This is the main page.</h1>
+	<button @click="setAddUI()">新增清單</button>
+	<table border=1>
+		<tr><td>序號</td><td>商品名稱</td><td>商品介紹</td><td>商品價格</td><td>狀態</td><td>-</td></tr>
+		<tr v-for="products in dat">
+			<td>{{products.id}}</td>
+			<td>{{products.name}}</td>
+			<td>{{products.illustrate}}</td>
+			<td>{{products.price}}</td>
+			<td><button @click="delproduct(products.id)">刪</button><button @click="setEditUI(products)">改</button></td>
+		</tr>
+	</table>
+</div>
+<div v-if="UI=='editForm'">
+	商品名稱: <input type="text"  v-model="newProducts.name"/> <br/>
+	商品介紹: <input type="text"  v-model="newProducts.illustrate"/> <br/>
+	商品價格: <input type="number"  v-model="newProducts.price"/> <br/>
+
+	<input type='button' @click="addproduct()" value="save">
+</div>
+</div>
+
+<script>
+const todoApp = Vue.createApp({
+	data() {
+		return {
+			UI: 'main',
+			dat: [],
+			newProducts: {
+				id: -1,
+				name: '',
+				illustrate:'',
+				price:''
+			}
+		}
+	},
+	methods: {
+		loadList: function() {
+			const that = this; //this  ==> stands for vm6. let's save `this` to `that`
+		//向URL發出request
+		fetch('merchant_todoControl.php?act=listproduct')
+		.then(function(response) {
+				return response.json();
+			})
+			.then(function(myJson) {
+				//we are inside the callback function, now `this` means the function, not vm6
+				//we will use `that` to access vm6
+
+				that.dat = myJson;
+				//todoApp.dat = myJson;
+			});
+		},
+
+		delproduct:function (id) {
+			const that = this;
+			let url="merchant_todoControl.php?act=delproduct&id="+id;
+		fetch(url,{
+			method: 'POST'
+		})
+		.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+		.then(function(data){ 
+			console.log(data);
+			that.loadList();
+		})
+
+		},
+
+		addproduct :function() {
+			const that=this;
+			let mydat = new FormData();
+			mydat.append( "dat", JSON.stringify(this.newProducts) );
+
+			let url="merchant_todoControl.php?act=addproduct";
+			fetch(url,{
+				method: 'POST',
+				body: mydat // 將表單物件放入fetch的body屬性
+			})
+			.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+			.then(function(data){ 
+				console.log(data);
+				that.setUI('main');
+				that.loadList();
+			})
+		},
+		setEditUI: function(products) {
+			this.newProducts=products;
+			this.setUI('editForm');
+		},
+		setAddUI: function() {
+			this.newProducts={
+				id: -1,
+				name: '',
+				illustrate: '',
+				price: ''
+			};
+			this.setUI('editForm');
+		},
+		setUI: function(page) {
+			this.UI=page;
+		}
+	},
+	created() {
+		this.loadList();
+	}
+}).mount("#main");
+</script>
+
+</body></html>
