@@ -12,12 +12,18 @@ switch ($act) {
         $jsonStr = $_POST['dat'];
         $products = json_decode($jsonStr);
         //verify
-        addproduct($products->name, $products->illustrate,$products->price,$products->$id);
+        addproduct($products->name, $products->illustrate,$products->price,$product->id);
         return;
     case "delproduct":
         $id = (int)$_REQUEST['id'];
         //verify
         delproduct($id);
+        return;
+	case "updateproduct":
+	    $id = (int)$_REQUEST['id'];
+        $jsonStr = $_POST['dat'];
+        $products = json_decode($jsonStr);
+        updateproduct($id,$products->name, $products->illustrate,$products->price);
         return;
     
     default:

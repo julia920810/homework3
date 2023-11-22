@@ -8,10 +8,10 @@
 <hr />
 <div id = "main">
 <div id="list" v-if="UI=='main'">
-	<h1>This is the main page.</h1>
+	<h1>商家清單</h1>
 	<button @click="setAddUI()">新增清單</button>
 	<table border=1>
-		<tr><td>序號</td><td>商品名稱</td><td>商品介紹</td><td>商品價格</td><td>狀態</td><td>-</td></tr>
+		<tr><td>序號</td><td>商品名稱</td><td>商品介紹</td><td>商品價格</td><td>功能</td></tr>
 		<tr v-for="products in dat">
 			<td>{{products.id}}</td>
 			<td>{{products.name}}</td>
@@ -27,6 +27,13 @@
 	商品價格: <input type="number"  v-model="newProducts.price"/> <br/>
 
 	<input type='button' @click="addproduct()" value="save">
+</div>
+<div v-if="UI=='editForm2'">
+	商品名稱: <input type="text"  v-model="newProducts.name"/> <br/>
+	商品介紹: <input type="text"  v-model="newProducts.illustrate"/> <br/>
+	商品價格: <input type="number"  v-model="newProducts.price"/> <br/>
+
+	<input type='button' @click="updateproduct()" value="save">
 </div>
 </div>
 
@@ -92,9 +99,26 @@ const todoApp = Vue.createApp({
 				that.loadList();
 			})
 		},
+		updateproduct :function() {
+			const that=this;
+			let mydat = new FormData();
+			mydat.append( "dat", JSON.stringify(this.newProducts) );
+
+			let url="merchant_todoControl.php?act=updateproduct&id="+this.newProducts.id;
+			fetch(url,{
+				method: 'POST',
+				body: mydat // 將表單物件放入fetch的body屬性
+			})
+			.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+			.then(function(data){ 
+				console.log(data);
+				that.setUI('main');
+				that.loadList();
+			})
+		},
 		setEditUI: function(products) {
 			this.newProducts=products;
-			this.setUI('editForm');
+			this.setUI('editForm2');
 		},
 		setAddUI: function() {
 			this.newProducts={

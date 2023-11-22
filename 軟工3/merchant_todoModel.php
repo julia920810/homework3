@@ -17,28 +17,28 @@ function getproductList() {
 
 function addproduct($name,$illustrate,$price,$id) {
 	global $db;
-	if($id > 0) {
-	$sql = "update commodity set name=?, illustrate=?, price=? where id=?";
+	$sql = "insert into commodity (name, illustrate, price) values (?, ?, ?)"; //SQL中的 ? 代表未來要用變數綁定進去的地方
 	$stmt = mysqli_prepare($db, $sql); //prepare sql statement
-	mysqli_stmt_bind_param($stmt, "sssi", $name,$illustrate,$price,$id); //bind parameters with variables, with types "sss":string, string ,string
-	} else {
-		$sql = "insert into commodity (name, illustrate, price) values (?, ?, ?)"; //SQL中的 ? 代表未來要用變數綁定進去的地方
-		$stmt = mysqli_prepare($db, $sql); //prepare sql statement
-		mysqli_stmt_bind_param($stmt, "sss", $name, $illustrate,$price); //bind parameters with variables, with types "sss":string, string ,string
-	}
+	mysqli_stmt_bind_param($stmt, "ssi", $name, $illustrate,$price); //bind parameters with variables, with types "sss":string, string ,string
 	mysqli_stmt_execute($stmt);  //執行SQL
 	return True;
 }
 
 function updateproduct($id,$name,$illustrate,$price) {
-	echo $id,$name,$illustrate,$price;
-	return;
+	global $db;
+    
+	$sql = "update commodity set name=?, illustrate=?, price=? where id=?"; //SQL中的 ? 代表未來要用變數綁定進去的地方
+	$stmt = mysqli_prepare($db, $sql); //prepare sql statement
+	mysqli_stmt_bind_param($stmt, "ssii", $name, $illustrate,$price,$id); //bind parameters with variables, with types "sss":string, string ,string
+	mysqli_stmt_execute($stmt);  //執行SQL
+	return True;
+
 }
 
 function delproduct($id) {
 	global $db;
 
-	$sql = "delete from commodity where id=?;"; //SQL中的 ? 代表未來要用變數綁定進去的地方
+	$sql = "delete from commodity where id=?"; //SQL中的 ? 代表未來要用變數綁定進去的地方
 	$stmt = mysqli_prepare($db, $sql); //prepare sql statement
 	mysqli_stmt_bind_param($stmt, "i", $id); //bind parameters with variables, with types "sss":string, string ,string
 	mysqli_stmt_execute($stmt);  //執行SQL
