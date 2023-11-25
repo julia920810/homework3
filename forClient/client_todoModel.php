@@ -1,7 +1,7 @@
 <?php
 require('dbconfig.php');
 
-function getProductList() {
+function getProductList() { //選取資料庫中commodity資料表的所有內容
 	global $db;
 	$sql = "select * from commodity;";
 	$stmt = mysqli_prepare($db, $sql ); //precompile sql指令，建立statement 物件，以便執行SQL
@@ -14,7 +14,7 @@ function getProductList() {
 	}
 	return $rows;
 }
-function getCartList() {
+function getCartList() { //選取資料庫中cart資料表的所有內容
 	global $db;
 	$sql = "select * from cart;";
 	$stmt = mysqli_prepare($db, $sql ); //precompile sql指令，建立statement 物件，以便執行SQL
@@ -27,22 +27,8 @@ function getCartList() {
 	}
 	return $rows;
 }
-
-// function addCart($id) {
-// 	global $db;
-
-// 	$sql = "INSERT INTO cart (id, name, price) SELECT id, name, price FROM commodity WHERE id = ?"; //SQL中的 ? 代表未來要用變數綁定進去的地方
-// 	$stmt = mysqli_prepare($db, $sql); //prepare sql statement
-// 	mysqli_stmt_bind_param($stmt, "isi", $id,$name,$price); //bind parameters with variables, with types "sss":string, string ,string
-// 	mysqli_stmt_execute($stmt);  //執行SQL
-// 	return True;
-// }
-
-function addCart($id, $quantity) {
+function addCart($id, $quantity) { //選取資料庫中cart資料表的所有內容並做商品id的篩選
     global $db;
-
-    // Assuming $name and $price are obtained from the commodity table
-    // $sql = "INSERT INTO cart (id, name, price, quantity) SELECT id, name, price, ? FROM commodity WHERE id = ?";
 	$check_sql = "SELECT * FROM cart WHERE id = ?";
     $check_stmt = mysqli_prepare($db, $check_sql);
     mysqli_stmt_bind_param($check_stmt, "i", $id);
@@ -50,41 +36,26 @@ function addCart($id, $quantity) {
     $existing_item = mysqli_stmt_get_result($check_stmt)->fetch_assoc();
 
     if ($existing_item) {
-        // Item already exists, update the quantity
+        // 如果商品已經存在 只需更新商品數量
         $update_sql = "UPDATE cart SET quantity = quantity + ? WHERE id = ?";
         $update_stmt = mysqli_prepare($db, $update_sql);
         mysqli_stmt_bind_param($update_stmt, "ii", $quantity, $id);
         $result = mysqli_stmt_execute($update_stmt);
     } else {
-        // Item doesn't exist, insert a new row
+        // 如果商品不存在 新增商品連同數量
         $insert_sql = "INSERT INTO cart (id, name, price, quantity) SELECT id, name, price, ? FROM commodity WHERE id = ?";
         $insert_stmt = mysqli_prepare($db, $insert_sql);
         mysqli_stmt_bind_param($insert_stmt, "ii", $quantity, $id);
         $result = mysqli_stmt_execute($insert_stmt);
     }
 
-    // Bind the parameters
-    // mysqli_stmt_bind_param($stmt, "ii", $quantity, $id);
-
-    // Execute the statement
-    // $result = mysqli_stmt_execute($stmt);
-
-    // Check if the execution was successful
     if ($result) {
         return true;
     } else {
-        // You can add error handling here if needed
         return false;
     }
 }
-
-
-// function updateJob($id, $jobName,$jobUrgent,$jobContent) {
-// 	echo $id, $jobName,$jobUrgent,$jobContent;
-// 	return;
-// }
-
-function delCart($id) {
+function delCart($id) { //刪除資料庫中cart資料表符合某id的商品
 	global $db;
 
 	$sql = "delete from cart where id=?;"; //SQL中的 ? 代表未來要用變數綁定進去的地方
