@@ -1,5 +1,5 @@
-<!-- 109213069 梁心瑜 109213041 林國棟 -->
 <?php
+//109213069 梁心瑜 109213041 林國棟
 require('dbconfig.php');
 
 function getProductList() { //選取資料庫中commodity資料表的所有內容
