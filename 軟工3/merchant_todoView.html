@@ -1,13 +1,19 @@
 <html><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="https://unpkg.com/vue@next"></script>
-
+  <style>
+    th, td {
+      text-align: center; /* 文本置中 */
+    }
+  </style>
 </head>
 
 <body >
+
 <hr />
 <div id = "main">
 <div id="list" v-if="UI=='main'">
+    <a href="初始畫面.html">載入初始頁面</a>
 	<h1>商家清單</h1>
 	<button @click="setAddUI()">新增清單</button>
 	<table border=1>
