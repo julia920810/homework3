@@ -13,7 +13,7 @@
 <hr />
 <div id = "main">
 <div id="list" v-if="UI=='main'">
-    <a href="初始畫面.html">載入初始頁面</a>
+    <a href="initial.html">載入初始頁面</a>
 	<h1>商家清單</h1>
 	<button @click="setAddUI()">新增清單</button>
 	<table border=1>
@@ -61,8 +61,8 @@ const todoApp = Vue.createApp({
 		loadList: function() {
 			const that = this; //this  ==> stands for vm6. let's save `this` to `that`
 		//向URL發出request
-		fetch('merchant_todoControl.php?act=listproduct')
-		.then(function(response) {
+			fetch('merchant_todoControl.php?act=listproduct')
+			.then(function(response) {
 				return response.json();
 			})
 			.then(function(myJson) {
@@ -77,14 +77,14 @@ const todoApp = Vue.createApp({
 		delproduct:function (id) {
 			const that = this;
 			let url="merchant_todoControl.php?act=delproduct&id="+id;
-		fetch(url,{
+			fetch(url,{
 			method: 'POST'
-		})
-		.then(function(res){return res.text(); }) //取得傳回值，轉為文字
-		.then(function(data){ 
+			})
+			.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+			.then(function(data){ 
 			console.log(data);
 			that.loadList();
-		})
+			})
 
 		},
 
