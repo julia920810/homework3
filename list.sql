@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2023-12-31 06:57:12
+-- 產生時間： 2023-12-31 06:57:27
 -- 伺服器版本： 10.4.24-MariaDB
 -- PHP 版本： 8.1.6
 
@@ -24,34 +24,25 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- 資料表結構 `commodity`
+-- 資料表結構 `list`
 --
 
-CREATE TABLE `commodity` (
-  `id` int(50) NOT NULL,
-  `name` varchar(60) NOT NULL,
-  `illustrate` varchar(60) NOT NULL,
-  `price` int(50) NOT NULL
+CREATE TABLE `list` (
+  `id` int(11) NOT NULL,
+  `custID` int(11) NOT NULL,
+  `price` int(11) NOT NULL,
+  `status` varchar(50) NOT NULL,
+  `evaluate` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- 傾印資料表的資料 `commodity`
---
-
-INSERT INTO `commodity` (`id`, `name`, `illustrate`, `price`) VALUES
-(1, '洗髮精', '順滑柔順保濕光澤', 299),
-(2, '沐浴乳', '估溜估溜', 199),
-(3, '洗面乳', '深層清潔', 128),
-(7, 'sss', 'ss', 22);
 
 --
 -- 已傾印資料表的索引
 --
 
 --
--- 資料表索引 `commodity`
+-- 資料表索引 `list`
 --
-ALTER TABLE `commodity`
+ALTER TABLE `list`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -59,10 +50,10 @@ ALTER TABLE `commodity`
 --
 
 --
--- 使用資料表自動遞增(AUTO_INCREMENT) `commodity`
+-- 使用資料表自動遞增(AUTO_INCREMENT) `list`
 --
-ALTER TABLE `commodity`
-  MODIFY `id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+ALTER TABLE `list`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
