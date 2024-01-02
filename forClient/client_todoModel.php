@@ -1,6 +1,5 @@
 <?php
 require('dbconfig.php');
-$custID = 1; // 暫時使用靜態的 custID，您可能需要根據實際情況修改
 
 function getProductList() {
     global $db;
@@ -16,9 +15,25 @@ function getProductList() {
     return $rows;
 }
 
+
 function getCartList($custID) {
     global $db;
     $sql = "SELECT * FROM cart WHERE custID = ?;";
+    $stmt = mysqli_prepare($db, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $custID);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    $rows = array();
+    while ($r = mysqli_fetch_assoc($result)) {
+        $rows[] = $r;
+    }
+    return $rows;
+}
+
+function getOrderList($custID) {
+    global $db;
+    $sql = "SELECT * FROM list WHERE custID = ?;";
     $stmt = mysqli_prepare($db, $sql);
     mysqli_stmt_bind_param($stmt, "i", $custID);
     mysqli_stmt_execute($stmt);

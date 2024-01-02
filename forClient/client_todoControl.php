@@ -2,10 +2,15 @@
 require('client_todoModel.php');
 
 $act = $_REQUEST['act'];
+$custID = isset($_REQUEST['custID']) ? (int)$_REQUEST['custID'] : 1; // 修改這裡，以便在所有地方正確取得 custID
 switch ($act) {
     case "listProduct":
         $product = getProductList();
         echo json_encode($product);
+        return;
+    case "listOrder":
+        $order = getOrderList($custID);
+        echo json_encode($order);
         return;
     case "addCart":
         $id = isset($_REQUEST['id']) ? (int)$_REQUEST['id'] : 0;
@@ -25,8 +30,6 @@ switch ($act) {
 	case "checkoutCart":
 		checkout($custID);
 		return;
-		
-		
     default:
 }
 ?>
