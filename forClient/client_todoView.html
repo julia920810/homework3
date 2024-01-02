@@ -1,5 +1,4 @@
 <html><head>
-  <!-- 109213069 梁心瑜 109213041 林國棟 -->
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <script type="text/javascript" src="https://unpkg.com/vue@next"></script>
   <style>
@@ -14,7 +13,7 @@
   <!-- 商品瀏覽介面 -->
   <div id="main">
   <div id="list" v-if="UI=='main'">
-    <h1>Product Viewing Interface</h1>
+    <h1>商品瀏覽介面</h1>
     <button @click="setUI('checkCart')">查看購物車</button>
     <table border=1>
       <tr><td>序號</td><td>商品名稱</td><td>商品說明</td><td>商品價格</td><td>商品數量</td><td>-</td></tr>
@@ -34,7 +33,7 @@
   </div>
   <!-- 購物車瀏覽介面 -->
   <div v-if="UI=='checkCart'">
-    <h1>Shopping Cart Interface</h1>
+    <h1>購物車介面</h1>
     <table border=1>
       <tr><td>序號</td><td>商品名稱</td><td>商品價格</td><td>商品數量</td><td>-</td></tr>
       <!-- array : cart -->
@@ -52,13 +51,18 @@
         <td><strong>總價</strong></td>
         <td>{{ calculateTotalPrice() }}</td>
       </tr>
-    </table>
+      <tr>
+        <td colspan="5">
+          <button @click="confirmCheckout()">送出訂單</button>
+        </td>
+      </tr>
+      </table>
     <!-- 返回商品瀏覽介面 -->
     <button @click="setUI('main')">返回商品介面</button>
   </div>
   </div>
   <script>
-  const todoApp= Vue.createApp({ //宣告 利用物件裡的createApp
+  const todoApp = Vue.createApp({ //宣告 利用物件裡的createApp
     data() { //在app裡定義資料結構為data
       return { //回傳以下物件
         UI: 'main',
@@ -68,7 +72,7 @@
     },
     methods: {
       loadList: function () { //商品瀏覽介面清單
-        const that=this; 
+        const that = this; 
         fetch('client_todoControl.php?act=listProduct') // --> 至todoControl的listProsuct
         .then(function(response) {
           return response.json();
@@ -78,7 +82,7 @@
         });
       },
       checkCart: function () { //購物車瀏覽介面清單
-        const that=this; 
+        const that = this; 
         fetch('client_todoControl.php?act=checkProduct') // --> 至todoControl的checkProduct
         .then(function(response) {
           return response.json();
@@ -88,17 +92,33 @@
           that.cart = myJson;
         });
       },
+      checkList: function () { //購物車結帳
+        const that = this;
+        fetch('client_todoControl.php?act=checkoutCart', {
+          method: 'POST', // 使用 POST 方法
+        })
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(myJson) {
+          console.log(myJson);
+          // 如果後端結帳成功，刷新購物車並返回商品瀏覽介面
+          if (myJson.success) {
+            that.cart = [];
+            that.setUI('main');
+          } else {
+            // 處理結帳失敗的情況，例如顯示錯誤訊息
+            console.error('結帳失敗:', myJson.message);
+          }
+        });
+      },
       calculateTotalPrice() { //計算總價
-      let totalPrice = 0;
-      for (let i = 0; i < this.cart.length; i++) {
-        totalPrice += this.cart[i].price * this.cart[i].quantity;
-      }
-      return totalPrice; 
+        return this.cart.reduce((total, item) => total + item.price * item.quantity, 0);
       },
       delCart: function (id) { //刪除購物車內某商品
-        const that=this;
-        let url="client_todoControl.php?act=delCart&id="+id; //--> 至todoControl的delCart
-        fetch(url,{
+        const that = this;
+        let url = "client_todoControl.php?act=delCart&id=" + id; //--> 至todoControl的delCart
+        fetch(url, {
           method: 'POST'
         })
         .then(function(res){return res.text(); }) //取得傳回值，轉為文字
@@ -106,29 +126,36 @@
           console.log(data);
           that.loadList(); 
           that.checkCart(); // refresh the cart immediately
-        })
+        });
       },
       confirmAddToCart(id, quantity) {
-      // 使用 confirm 函數彈出確認對話框
-      const isConfirmed = window.confirm('確定要將商品加入購物車嗎？');
+        // 使用 confirm 函數彈出確認對話框
+        const isConfirmed = window.confirm('確定要將商品加入購物車嗎？');
 
-      // 如果用戶按下確認，執行加入購物車的相應邏輯
-      if (isConfirmed) {
-        const quantity = document.getElementById('quantity'+id).value;
-        this.addCart(id, quantity); // --> addCart()
-      }
-    },
-    confirmDelToCart(id) {
-      // 使用 confirm 函數彈出確認對話框
-      const isConfirmed = window.confirm('確定要將商品從購物車刪除嗎？');
+        // 如果用戶按下確認，執行加入購物車的相應邏輯
+        if (isConfirmed) {
+          this.addCart(id, quantity); // --> addCart()
+        }
+      },
+      confirmDelToCart(id) {
+        // 使用 confirm 函數彈出確認對話框
+        const isConfirmed = window.confirm('確定要將商品從購物車刪除嗎？');
 
-      // 如果用戶按下確認，執行移除商品的相應邏輯
-      if (isConfirmed) {
-        this.delCart(id); // --> delCart()
-      }
-    },
+        // 如果用戶按下確認，執行移除商品的相應邏輯
+        if (isConfirmed) {
+          this.delCart(id); // --> delCart()
+        }
+      },
+      confirmCheckout() {
+        // 使用 confirm 函數彈出確認對話框
+        const isConfirmed = window.confirm('確定要送出訂單嗎？');
+
+        if (isConfirmed) {
+          this.checkList(); 
+        }
+      },
       addCart: function (id, quantity) { //新增某商品至購物車
-        const that=this;
+        const that = this;
         const requestData = {
           id: id,
           quantity: quantity,

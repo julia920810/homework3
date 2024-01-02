@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
--- 主機： localhost
--- 產生時間： 2023 年 11 月 20 日 05:24
--- 伺服器版本： 10.4.28-MariaDB
--- PHP 版本： 8.0.28
+-- 主機： 127.0.0.1
+-- 產生時間： 2023-12-31 06:56:56
+-- 伺服器版本： 10.4.24-MariaDB
+-- PHP 版本： 8.1.6
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -29,17 +29,11 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `cart` (
   `id` int(100) NOT NULL,
+  `custID` int(11) NOT NULL,
   `name` varchar(50) NOT NULL,
   `price` int(100) NOT NULL,
   `quantity` int(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- 傾印資料表的資料 `cart`
---
-
-INSERT INTO `cart` (`id`, `name`, `price`, `quantity`) VALUES
-(2, '沐浴乳', 199, 4);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
