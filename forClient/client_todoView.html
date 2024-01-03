@@ -65,32 +65,50 @@
       <!-- 返回商品瀏覽介面 -->
       <button @click="setUI('main')">返回商品介面</button>
     </div>
-
     <!-- 訂單瀏覽介面 -->
-<div v-if="UI=='orderView'">
-  <h1>訂單瀏覽介面</h1>
-  <table border=1>
-    <tr><td>訂單編號</td><td>客戶編號</td><td>金額</td><td>狀態</td><td>評價</td></tr>
-    <!-- array : orders -->
-    <tr v-for="order in orders"> 
-      <td>{{order.id}}</td>
-      <td>{{order.custID}}</td>
-      <td>{{order.price}}</td>
-      <td>{{order.status}}</td>
-      <td>
-        <!-- 使用條件判斷式，如果評價為0，顯示「未評價」 -->
-        <span v-if="order.evaluate === 0">未評價</span>
-        <span v-else>{{order.evaluate}}</span>
-      </td>
-    </tr>
-    <tr>
-      <td colspan="5">
-        <button @click="setUI('main')">返回商品介面</button>
-      </td>
-    </tr>
-  </table>
-</div>
-
+    <div v-if="UI=='orderView'">
+      <h1>訂單瀏覽介面</h1>
+      <table border=1>
+        <tr>
+          <td>訂單編號</td><td>客戶編號</td><td>金額</td><td>狀態</td><td>評價</td><td>-</td>
+        </tr>
+        <!-- array : orders -->
+        <tr v-for="order in orders"> 
+          <td>{{order.id}}</td>
+          <td>{{order.custID}}</td>
+          <td>{{order.price}}</td>
+          <td>{{order.status}}</td>
+          <td>
+            <!-- 使用條件判斷式，只有在訂單狀態為已完成時才顯示評價選項 -->
+            <span v-if="order.status === '已完成'">
+              <!-- 利用商品瀏覽介面的數量選取方法來提交評價 -->
+              <span v-if="order.evaluate === 0">
+                <select v-model="selectedEvaluation" :id="'evaluate' + order.id">
+                  <option value="1">1分</option>
+                  <option value="2">2分</option>
+                  <option value="3">3分</option>
+                  <option value="4">4分</option>
+                  <option value="5">5分</option>
+                </select>
+              </span>
+              <!-- 若評價不為0，顯示評價分數 -->
+              <span v-else>{{order.evaluate}}分</span>
+            </span>
+            <!-- 若訂單狀態不是已完成，顯示提示訊息 -->
+            <span v-else>尚未完成</span>
+          </td>
+          <!-- 提交評價的按鈕 -->
+          <td>
+            <button v-if="order.status === '已完成' && order.evaluate === 0" @click="confirmSubmitEvaluation(order.id)">提交</button>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="6">
+            <button @click="setUI('main')">返回商品介面</button>
+          </td>
+        </tr>
+      </table>
+    </div>
   <script>
     const todoApp = Vue.createApp({
       data() {
@@ -100,6 +118,7 @@
           cart: [],
           orders: [],
           custID: 1,
+          selectedEvaluation: 0,
         }
       },
       methods: {
@@ -190,13 +209,19 @@
             this.checkList(); 
           }
         },
-        addCart: function (id, quantity) {
+        confirmSubmitEvaluation(orderId) {
+          const isConfirmed = window.confirm('確定要提交評價嗎？');
+          if (isConfirmed) {
+            this.submitEvaluation(orderId, this.selectedEvaluation);
+          }
+        },
+        submitEvaluation(orderId, evaluation) {
           const that = this;
           const requestData = {
-            id: id,
-            quantity: quantity,
+            orderId: orderId,
+            evaluation: evaluation,
           };
-          fetch('client_todoControl.php?act=addCart&id='+id+'&quantity='+quantity, {
+          fetch('client_todoControl.php?act=submitEvaluation&orderId=' + orderId + '&evaluation=' + evaluation, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -208,9 +233,10 @@
           })
           .then(function(data) {
             console.log(data);
-            that.setUI('main');
+            // 在提交評價後的相應處理，重新載入訂單列表等
             that.loadList();
             that.checkCart();
+            that.checkOrder();  // 在這裡重新載入訂單數據
           });
         },
         setUI: function(page) {

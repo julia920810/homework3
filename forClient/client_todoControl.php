@@ -30,6 +30,17 @@ switch ($act) {
 	case "checkoutCart":
 		checkout($custID);
 		return;
+    case "submitEvaluation":
+        $orderId = isset($_REQUEST['orderId']) ? (int)$_REQUEST['orderId'] : 0;
+        $evaluation = isset($_REQUEST['evaluation']) ? (int)$_REQUEST['evaluation'] : 0;
+    
+        if ($orderId > 0 && $evaluation > 0 && $evaluation <= 5) {
+            submitEvaluation($orderId, $evaluation);
+            echo "評價提交成功";
+        } else {
+            echo "無效的評價參數";
+        }
+        return;        
     default:
 }
 ?>

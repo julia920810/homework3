@@ -132,5 +132,13 @@ function clearCart($custID) {
     mysqli_stmt_execute($stmt);
 }
 
+function submitEvaluation($orderId, $evaluation) {
+    global $db;
+
+    $update_sql = "UPDATE `list` SET evaluate = ? WHERE id = ?";
+    $stmt = mysqli_prepare($db, $update_sql);
+    mysqli_stmt_bind_param($stmt, "ii", $evaluation, $orderId);
+    mysqli_stmt_execute($stmt);
+}
 
 ?>
