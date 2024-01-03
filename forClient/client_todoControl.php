@@ -2,7 +2,8 @@
 require('client_todoModel.php');
 
 $act = $_REQUEST['act'];
-$custID = isset($_REQUEST['custID']) ? (int)$_REQUEST['custID'] : 1; // 修改這裡，以便在所有地方正確取得 custID
+$custID = isset($_REQUEST['custID']) ? (int)$_REQUEST['custID'] : getCustID();
+
 switch ($act) {
     case "listProduct":
         $product = getProductList();
@@ -13,10 +14,15 @@ switch ($act) {
         echo json_encode($order);
         return;
     case "addCart":
-        $id = isset($_REQUEST['id']) ? (int)$_REQUEST['id'] : 0;
-        $quantity = isset($_REQUEST['quantity']) ? (int)$_REQUEST['quantity'] : 0;
+        $requestData = json_decode(file_get_contents('php://input'), true); //***
+        var_dump($requestData);exit;
+        $id = isset($requestData['id']) ? (int)$requestData['id'] : 0;
+        $quantity = isset($requestData['quantity']) ? (int)$requestData['quantity'] : 0;
+        // 不再使用此行：$custID = isset($requestData['custID']) ? (int)$requestData['custID'] : 0;
+
         if ($id > 0 && $quantity > 0) {
-            addCart($id, $quantity, $custID);
+            // 不再使用此行：addCart($id, $quantity, $custID);
+            addCart($id, $quantity, $custID); // 這裡不需要再次指定 $custID
         }
         return;
     case "delCart":
@@ -27,20 +33,20 @@ switch ($act) {
         $item = getCartList($custID);
         echo json_encode($item);
         return;
-	case "checkoutCart":
-		checkout($custID);
-		return;
+    case "checkoutCart":
+        checkout($custID);
+        return;
     case "submitEvaluation":
         $orderId = isset($_REQUEST['orderId']) ? (int)$_REQUEST['orderId'] : 0;
         $evaluation = isset($_REQUEST['evaluation']) ? (int)$_REQUEST['evaluation'] : 0;
-    
+
         if ($orderId > 0 && $evaluation > 0 && $evaluation <= 5) {
             submitEvaluation($orderId, $evaluation);
             echo "評價提交成功";
         } else {
             echo "無效的評價參數";
         }
-        return;        
+        return;
     default:
 }
 ?>
