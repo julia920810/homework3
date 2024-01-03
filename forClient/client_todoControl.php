@@ -15,7 +15,7 @@ switch ($act) {
         return;
     case "addCart":
         $requestData = json_decode(file_get_contents('php://input'), true); //***
-        var_dump($requestData);exit;
+        var_dump($requestData);
         $id = isset($requestData['id']) ? (int)$requestData['id'] : 0;
         $quantity = isset($requestData['quantity']) ? (int)$requestData['quantity'] : 0;
         // 不再使用此行：$custID = isset($requestData['custID']) ? (int)$requestData['custID'] : 0;
