@@ -14,17 +14,23 @@ switch ($act) {
         echo json_encode($order);
         return;
     case "addCart":
-        $requestData = json_decode(file_get_contents('php://input'), true); //***
+        $requestData = json_decode(file_get_contents('php://input'), true);
         var_dump($requestData);
         $id = isset($requestData['id']) ? (int)$requestData['id'] : 0;
         $quantity = isset($requestData['quantity']) ? (int)$requestData['quantity'] : 0;
+        $custID = isset($requestData['custID']) ? (int)$requestData['custID'] : 0;
+        echo "id: " . $id;
+        echo "quantity: " . $quantity;
+        echo "custID: " . $custID;
+        
         // 不再使用此行：$custID = isset($requestData['custID']) ? (int)$requestData['custID'] : 0;
-
+        
         if ($id > 0 && $quantity > 0) {
+            addCart($id, $quantity, $custID);
             // 不再使用此行：addCart($id, $quantity, $custID);
-            addCart($id, $quantity, $custID); // 這裡不需要再次指定 $custID
+            // addCart($id, $quantity, $_SESSION['custID']); // 使用 session 中的 custID
         }
-        return;
+        return;        
     case "delCart":
         $id = (int)$_REQUEST['id'];
         delCart($id, $custID);

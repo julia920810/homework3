@@ -164,7 +164,7 @@
             <span v-if="order.status === '已完成'">
               <!-- 利用商品瀏覽介面的數量選取方法來提交評價 -->
               <span v-if="order.evaluate === 0">
-                <select v-model="selectedEvaluation" :id="'evaluate' + order.id">
+                <select v-model="orderEvaluations[order.id]" :id="'evaluate' + order.id">
                   <option value="1">1分</option>
                   <option value="2">2分</option>
                   <option value="3">3分</option>
@@ -212,6 +212,7 @@
           orders: [],
           custID: null,
           selectedEvaluation: 0,
+          orderEvaluations: {},
           username: null,
         };
       },
@@ -236,6 +237,13 @@
             })
             .then(function(myJson) {
               that.dat = myJson;
+
+              // 初始化 orderEvaluations
+              that.orderEvaluations = {};
+              that.dat.forEach(order => {
+                // 使用普通的 JavaScript 賦值語法
+                that.orderEvaluations[order.id] = 0;
+              });
             });
         },
         checkCart: function () {
@@ -303,25 +311,25 @@
         addCart(id, quantity, custID) {
           const that = this;
           const requestData = {
-            id: id,
-            quantity: quantity,
-            custID: custID, // 將 custID 添加到 requestData 中
+              id: id,
+              quantity: quantity,
+              custID: custID,
           };
 
           fetch('client_todoControl.php?act=addCart&custID=' + custID, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestData)
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(requestData),
           })
           .then(function(res) { return res.text(); })
           .then(function(data) {
-            console.log(data);
-            that.loadList();
-            that.checkCart();
+              console.log(data);
+              that.loadList();
+              that.checkCart();
           });
-        },
+      },
         confirmAddToCart(id, quantity) {
           const isConfirmed = window.confirm('確定要將商品加入購物車嗎？');
           if (isConfirmed) {
@@ -376,12 +384,15 @@
             this.checkOrder();
           }.bind(this));
         },
-        async submitEvaluation(orderId, evaluation) {
+        async submitEvaluation(orderId) {
           const that = this;
+          const evaluation = that.orderEvaluations[orderId];
+
           const requestData = {
             orderId: orderId,
             evaluation: evaluation,
           };
+
           try {
             const response = await fetch('client_todoControl.php?act=submitEvaluation&orderId=' + orderId + '&evaluation=' + evaluation, {
               method: 'POST',
