@@ -368,17 +368,17 @@
             return response.json();
           })
           .then(function(myJson) {
-            if (myJson.success) {
-              console.log('訂單完成成功');
-            } else {
-              console.error('訂單完成失敗:', myJson.message);
-            }
+            // if (myJson.success) {
+            //   console.log('訂單完成成功');
+            // } else {
+            //   console.error('訂單完成失敗:', myJson.message);
+            // }
 
             // 完成後，重新載入訂單列表等
             this.checkOrder();
           }.bind(this))
           .catch(function(error) {
-            console.error('訂單完成失敗:', error);
+            // console.error('訂單完成失敗:', error);
 
             // 完成後，重新載入訂單列表等
             this.checkOrder();
