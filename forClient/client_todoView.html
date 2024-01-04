@@ -78,6 +78,11 @@
       float: right;
       margin-bottom: 15px;
     }
+
+    .disabled-button {
+    background-color: #ccc; /* 灰色背景 */
+    cursor: not-allowed; /* 鼠標指針顯示為禁止符號 */
+    } 
   </style>
 </head>
 
@@ -150,7 +155,7 @@
       </div>
       <table border=1>
         <tr>
-          <td>訂單編號</td><td>客戶編號</td><td>金額</td><td>狀態</td><td>評價</td><td>-</td>
+          <td>訂單編號</td><td>客戶編號</td><td>金額</td><td>狀態</td><td>對商家滿意度</td><td>-</td><td>-</td>
         </tr>
         <!-- array : orders -->
         <tr v-for="order in orders"> 
@@ -177,14 +182,30 @@
             <!-- 若訂單狀態不是已完成，顯示提示訊息 -->
             <span v-else>尚未完成</span>
           </td>
-          <!-- 提交評價的按鈕 -->
+          <!-- 提交評價按鈕 -->
           <td>
-            <button v-if="order.status === '已完成' && order.evaluate === 0" @click="confirmSubmitEvaluation(order.id)">提交</button>
+            <button
+              :class="{ 'disabled-button': isButtonDisabled(order, 'evaluate') }"
+              @click="confirmSubmitEvaluation(order.id)"
+              :disabled="isButtonDisabled(order, 'evaluate')"
+            >
+              提交
+            </button>
+          </td>
+          <!-- 新增完成訂單的按鈕 -->
+          <!-- 完成訂單按鈕 -->
+          <td>
+            <button
+              :class="{ 'disabled-button': isButtonDisabled(order, 'complete') }"
+              @click="confirmCompleteOrder(order.id)"
+              :disabled="isButtonDisabled(order, 'complete')"
+            >
+              完成訂單
+            </button>
           </td>
         </tr>
       </table>
     </div>
-  </div>
   <script>
     const todoApp = Vue.createApp({
       data() {
@@ -199,6 +220,18 @@
         };
       },
       methods: {
+        isButtonDisabled(order, type) {
+          if (type === 'complete') {
+            // 如果訂單已完成，或者評價已經提交，則禁用完成訂單按鈕
+            return order.status === '已完成' || order.evaluate !== 0;
+          } else if (type === 'evaluate') {
+            // 如果訂單尚未完成，或者已經提交評價，則禁用提交評價按鈕
+            return order.status !== '已完成' || order.evaluate !== 0;
+          }
+
+          // 預設情況下不禁用按鈕
+          return false;
+        },
         loadList: function () {
           const that = this; 
           fetch('client_todoControl.php?act=listProduct&custID=' + this.custID)
@@ -316,6 +349,36 @@
           if (isConfirmed) {
             this.submitEvaluation(orderId, this.selectedEvaluation);
           }
+        },
+        confirmCompleteOrder(orderId) {
+          const isConfirmed = window.confirm('確定要完成訂單嗎？');
+          if (isConfirmed) {
+            this.completeOrder(orderId);
+          }
+        },
+        completeOrder(orderId) {
+          fetch('client_todoControl.php?act=completeOrder&orderId=' + orderId, {
+            method: 'POST',
+          })
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(myJson) {
+            if (myJson.success) {
+              console.log('訂單完成成功');
+            } else {
+              console.error('訂單完成失敗:', myJson.message);
+            }
+
+            // 完成後，重新載入訂單列表等
+            this.checkOrder();
+          }.bind(this))
+          .catch(function(error) {
+            console.error('訂單完成失敗:', error);
+
+            // 完成後，重新載入訂單列表等
+            this.checkOrder();
+          }.bind(this));
         },
         async submitEvaluation(orderId, evaluation) {
           const that = this;

@@ -47,6 +47,16 @@ switch ($act) {
             echo "無效的評價參數";
         }
         return;
+    case "completeOrder":
+        $orderId = isset($_REQUEST['orderId']) ? (int)$_REQUEST['orderId'] : 0;
+    
+        if ($orderId > 0) {
+            completeOrder($orderId);
+            echo json_encode(['success' => true, 'message' => '訂單完成成功']);
+        } else {
+            echo json_encode(['success' => false, 'message' => '無效的訂單ID']);
+        }
+        return;
     default:
 }
 ?>

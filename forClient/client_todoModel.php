@@ -173,7 +173,12 @@ function getCustID() {
     }
 }
 
+function completeOrder($orderId) {
+    global $db;
 
-
-
+    $update_sql = "UPDATE `list` SET status = '已完成' WHERE id = ?";
+    $stmt = mysqli_prepare($db, $update_sql);
+    mysqli_stmt_bind_param($stmt, "i", $orderId);
+    mysqli_stmt_execute($stmt);
+}
 ?>
