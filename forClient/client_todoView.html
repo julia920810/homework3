@@ -34,6 +34,7 @@
       padding: 10px 15px;
       cursor: pointer;
       border-radius: 5px;
+      margin-right: 5px;
     }
 
     button:hover {
@@ -72,6 +73,11 @@
       padding: 5px;
       box-sizing: border-box;
     }
+
+    .topbar{
+      float: right;
+      margin-bottom: 15px;
+    }
   </style>
 </head>
 
@@ -82,8 +88,10 @@
     <div id="list" v-if="UI=='main'">
       <h1>商品瀏覽介面</h1>
       <p>使用者您好，custID = {{custID}}, username = {{username}}</p>
-      <button @click="setUI('checkCart')">查看購物車</button>
-      <button @click="setUI('orderView')">查看訂單</button>
+      <div class="topbar">
+        <button @click="setUI('checkCart')">查看購物車</button>
+        <button @click="setUI('orderView')">查看訂單</button>
+      </div>
       <table border=1>
         <tr><td>序號</td><td>商品名稱</td><td>商品說明</td><td>商品價格</td><td>商品數量</td><td>-</td></tr>
         <!-- array : dat -->
@@ -105,6 +113,10 @@
     <!-- 購物車瀏覽介面 -->
     <div v-if="UI=='checkCart'">
       <h1>購物車介面</h1>
+      <div class="topbar">
+        <!-- 返回商品瀏覽介面 -->
+        <button @click="setUI('main')">返回商品介面</button>
+      </div>
       <table border=1>
         <tr><td>序號</td><td>商品名稱</td><td>商品價格</td><td>商品數量</td><td>-</td></tr>
         <!-- array : cart -->
@@ -128,12 +140,14 @@
           </td>
         </tr>
       </table>
-      <!-- 返回商品瀏覽介面 -->
-      <button @click="setUI('main')">返回商品介面</button>
     </div>
     <!-- 訂單瀏覽介面 -->
     <div v-if="UI=='orderView'">
       <h1>訂單瀏覽介面</h1>
+      <div class="topbar">
+        <!-- 返回商品瀏覽介面 -->
+        <button @click="setUI('main')">返回商品介面</button>
+      </div>
       <table border=1>
         <tr>
           <td>訂單編號</td><td>客戶編號</td><td>金額</td><td>狀態</td><td>評價</td><td>-</td>
@@ -166,11 +180,6 @@
           <!-- 提交評價的按鈕 -->
           <td>
             <button v-if="order.status === '已完成' && order.evaluate === 0" @click="confirmSubmitEvaluation(order.id)">提交</button>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="6">
-            <button @click="setUI('main')">返回商品介面</button>
           </td>
         </tr>
       </table>
