@@ -1,6 +1,6 @@
 <html><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<script type="text/javascript" src="https://unpkg.com/vue@next"></script>
+<script type="text/javascript" src="https://unpkg.com/vue@3.0.11"></script>
   <style>
     th, td {
       text-align: center; /* 文本置中 */
@@ -13,9 +13,11 @@
 <hr />
 <div id = "main">
 <div id="list" v-if="UI=='main'">
-    <a href="初始畫面.html">載入初始頁面</a>
+    <a href="initial.html">載入初始頁面</a>
 	<h1>商家清單</h1>
 	<button @click="setAddUI()">新增清單</button>
+	<button @click="setUINotprocessed('Notprocessed')">查看未處理訂單</button>
+	<button @click="setUIprocessing('processing')">查看處理中訂單</button>
 	<table border=1>
 		<tr><td>序號</td><td>商品名稱</td><td>商品介紹</td><td>商品價格</td><td>功能</td></tr>
 		<tr v-for="products in dat">
@@ -24,6 +26,38 @@
 			<td>{{products.illustrate}}</td>
 			<td>{{products.price}}</td>
 			<td><button @click="delproduct(products.id)">刪</button><button @click="setEditUI(products)">改</button></td>
+		</tr>
+	</table>
+
+
+</div>
+<div v-if="UI=='Notprocessed'">
+	<h1>未處理訂單</h1>
+	<button @click="setUI('main')">返回商品介面</button>
+	<button @click="setUIprocessing('processing')">查看處理中訂單</button>
+	<table border=1>
+		<tr><td>序號</td><td>顧客序號</td><td>商品價格</td><td>狀態</td><td>-</td></tr>
+		<tr v-for="status in list">
+			<td>{{status.id}}</td>
+			<td>{{status.custID}}</td>
+			<td>{{status.price}}</td>
+			<td>{{status.status}}</td>
+			<td><button @click="setEditUINotprocessed(status.id)">更改為處理中</button></td>
+		</tr>
+	</table>
+</div>
+<div v-if="UI=='processing'">
+	<h1>處理中訂單</h1>
+	<button @click="setUI('main')">返回商品介面</button>
+	<button @click="setUINotprocessed('Notprocessed')">查看未處理訂單</button>
+	<table border=1>
+		<tr><td>序號</td><td>顧客序號</td><td>商品價格</td><td>狀態</td><td>-</td></tr>
+		<tr v-for="status in list">
+			<td>{{status.id}}</td>
+			<td>{{status.custID}}</td>
+			<td>{{status.price}}</td>
+			<td>{{status.status}}</td>
+			<td><button @click="setEditUIprocessing(status.id)">更改為寄送中</button></td>
 		</tr>
 	</table>
 </div>
@@ -49,20 +83,22 @@ const todoApp = Vue.createApp({
 		return {
 			UI: 'main',
 			dat: [],
+			list: [],
 			newProducts: {
 				id: -1,
 				name: '',
 				illustrate:'',
 				price:''
 			}
+			
 		}
 	},
 	methods: {
 		loadList: function() {
 			const that = this; //this  ==> stands for vm6. let's save `this` to `that`
 		//向URL發出request
-		fetch('merchant_todoControl.php?act=listproduct')
-		.then(function(response) {
+			fetch('merchant_todoControl.php?act=listproduct')
+			.then(function(response) {
 				return response.json();
 			})
 			.then(function(myJson) {
@@ -77,14 +113,14 @@ const todoApp = Vue.createApp({
 		delproduct:function (id) {
 			const that = this;
 			let url="merchant_todoControl.php?act=delproduct&id="+id;
-		fetch(url,{
+			fetch(url,{
 			method: 'POST'
-		})
-		.then(function(res){return res.text(); }) //取得傳回值，轉為文字
-		.then(function(data){ 
+			})
+			.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+			.then(function(data){ 
 			console.log(data);
 			that.loadList();
-		})
+			})
 
 		},
 
@@ -122,6 +158,28 @@ const todoApp = Vue.createApp({
 				that.loadList();
 			})
 		},
+		Notprocessed: function () { //未處理清單瀏覽
+			const that = this;
+			fetch('merchant_todoControl.php?act=Notprocessed') // --> 
+			.then(function(response) {
+			return response.json();
+			})
+			.then(function(myJson) {
+			console.log(myJson);
+			that.list = myJson;
+			});
+        },
+	    processing: function () { //處理中清單瀏覽
+			const that = this;
+			fetch('merchant_todoControl.php?act=processing') // --> 
+			.then(function(response) {
+			return response.json();
+			})
+			.then(function(myJson) {
+			console.log(myJson);
+			that.list = myJson;
+			});
+        },
 		setEditUI: function(products) {
 			this.newProducts=products;
 			this.setUI('editForm2');
@@ -135,12 +193,54 @@ const todoApp = Vue.createApp({
 			};
 			this.setUI('editForm');
 		},
-		setUI: function(page) {
+		setUINotprocessed: function(page) {
 			this.UI=page;
-		}
+			this.Notprocessed();
+		},
+		setUIprocessing: function(page) {
+			this.UI=page;
+			this.processing();
+		},
+		setUI: function(page){
+			this.UI=page;
+			this.loadList();
+		},
+		setEditUINotprocessed: function(status) {
+			const that=this;
+			let mydat = new FormData();
+
+			let url="merchant_todoControl.php?act=updatestatus&id="+status;
+			fetch(url,{
+				method: 'POST',
+				body: mydat // 將表單物件放入fetch的body屬性
+			})
+			.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+			.then(function(myJson) {
+			console.log(myJson);
+			that.list = myJson;
+			});
+		},
+		setEditUIprocessing: function(status) {
+			const that=this;
+			let mydat = new FormData();
+
+			let url="merchant_todoControl.php?act=updatestatus2&id="+status;
+			fetch(url,{
+				method: 'POST',
+				body: mydat // 將表單物件放入fetch的body屬性
+			})
+			.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+			.then(function(myJson) {
+			console.log(myJson);
+			that.list = myJson;
+			});
+		},
+
 	},
 	created() {
 		this.loadList();
+
+    
 	}
 }).mount("#main");
 </script>

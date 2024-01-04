@@ -26,6 +26,25 @@ switch ($act) {
         updateproduct($id,$products->name, $products->illustrate,$products->price);
         return;
     
+    case "Notprocessed":
+        $status=getNotprocessed(); //--> todoModel的Notprocessed()做資料庫的資料處理
+        echo json_encode($status);
+        return;    
+
+    case "processing":
+        $status=getprocessing(); //--> todoModel的processed()做資料庫的資料處理
+        echo json_encode($status);
+        return; 
+    
+    case "updatestatus":
+        $id=(int)$_REQUEST['id'];
+        updatestatus($id);
+        return;
+
+    case "updatestatus2":
+        $id=(int)$_REQUEST['id'];
+        updatestatus2($id);
+        return;
     default:
 
 }
