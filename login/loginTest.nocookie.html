@@ -1,0 +1,193 @@
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="https://unpkg.com/vue@3.0.11"></script>
+<!--
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+-->
+</head>
+
+<body >
+<hr />
+<div id="main">
+<!--customer ui -->
+<div id="list" v-if = "UI == 'custForm'">
+	<h1>Welcome customer.This customer page.</h1>
+	<hr/>
+	<input type='button' @click="logout()" value="logout"/>
+</div>
+	
+<!--merchForm ui -->
+<div id="list" v-if="UI=='merchForm'">
+	<h1>This is the merchant page.</h1>
+	<hr/>
+	<input type='button' @click="logout()" value="logout"/>	
+</div>
+
+<!--logistics ui -->
+<div id="list" v-if="UI=='logistForm'">
+	<h1>This is the logistics page.</h1>
+	<hr/>
+	<input type='button' @click="logout()" value="logout"/>	
+</div>
+<!--客戶的注冊頁面 ui -->
+<div id="list" v-if="UI=='registForm'">
+	<h1>這是客戶的注冊頁面.請輸入username和passward</h1>
+	<hr/>
+	ID: <input type="text"  v-model="clientdata.clientid"/> <br/>
+	Password: <input type="text" v-model="clientdata.clientpwd" />
+	<input type='button' @click="register()" value="注冊"/> <br/>
+	<input type='button' @click="logout()" value="回到登入頁面"/>	
+</div>
+
+<!--登入頁面 ui -->
+<div v-if="UI=='loginForm'">
+	<h1>這是登入頁面.請輸入username和passward</h1>
+	<hr/>
+	ID: <input type="text"  v-model="username"/> <br/>
+	Password: <input type="text" v-model="password" />
+	<input type='button' @click="login()" value="login"/> <br/>
+	<input type='button' @click="jumptoregist()" value="客戶注冊"/> <br/>
+</div>
+	<hr/>
+	{{info}}
+	<input type='button' @click="loadInfo()" value="load Info"/> <br/>
+</div>
+<script>
+const role=function() {
+	let a=10;
+	function get() {
+	return a;
+	}
+}
+const todoApp= Vue.createApp({
+	data() {
+		return {
+			UI: '',
+			dat: [],
+			clientdata:{
+				clientid: '',
+				clientpwd:'',
+				clientrole:'1'
+			},
+			username: '',
+			password: '',
+			info: 'xx',
+			Cid: 0
+		}
+	},
+	methods: {
+		setUI: function(page) {
+			this.UI=page;
+		},
+		checkLogin: function() {
+			/*
+			const role=Cookies.get('loginRole');
+			sessionStorage.setItem('role', role)
+			console.log(role, this.login.myRole);
+			*/
+			// 以Cid 去決定不同角色的UI 0是login 1是顧客 2是商家 3是物流 4是顧客註冊 5是
+			if (this.Cid == 0) {
+				this.setUI('loginForm');
+			} 
+			else if(this.Cid == 1){
+				this.setUI('custForm')
+			}
+			else if(this.Cid == 2){
+				this.setUI('merchForm');
+			}
+			else if(this.Cid == 3){
+				this.setUI('logistForm');
+			}
+			else if(this.Cid == 4){
+				this.setUI('registForm');
+			}
+		},
+		login: function() {
+				const that=this;
+				let mydat = new FormData();
+				mydat.append( "username", this.username);
+				// you may also use document.getElementById('loginID').value to get that field
+				mydat.append( "password", this.password);
+				mydat.append( "act", 'login');
+
+				let url="loginCheck.php";
+				//url="loginCheck.py";
+				fetch(url,{
+					method: 'POST',
+					body: mydat // 將表單物件放入fetch的body屬性
+				})
+				.then(function(res){return res.json(); }) //取得傳回值，轉為json
+				.then(function(data){
+					console.log(data);
+					//server 設定的cookie,httponly:true時, client 端讀不到,使用json裡的資料
+					that.Cid = data.role;
+					that.checkLogin();
+				})
+		},
+		loadInfo: function() {
+				const that=this;
+				let mydat = new FormData();
+				mydat.append( "act", 'showInfo'); //show界面
+				let url="loginCheck.php";
+				//url="loginCheck.py";
+				fetch(url,{
+					method: 'POST',
+					body: mydat
+				})
+				.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+				.then(function(data){
+					that.info = data;
+				})
+		},
+		logout: function() {
+			//發request請server改cookie
+			const that=this;
+			let url="loginCheck.php?act=logout"; //用url 去到 act "logout" 這個key word
+			fetch(url)
+			.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+			.then(function(data){
+				//調整local的變數
+				that.Cid = 0; //reset Role 變回 0
+				that.checkLogin();
+			})
+		},
+		register: function(){
+			const that = this;
+			let mydat = new FormData();
+				// you may also use document.getElementById('loginID').value to get that field
+			mydat.append( "dat", JSON.stringify(this.clientdata) );
+			mydat.append( "act", 'register'); 
+
+			let url="loginCheck.php";
+			fetch(url,{
+					method: 'POST',
+					body: mydat // 將表單物件放入fetch的body屬性
+			})
+			.then(function(res){return res.json(); }) //取得傳回值，轉為文字
+			.then(function(data){
+				console.log(data);
+				//server 設定的cookie,httponly:true時, client 端讀不到,使用json裡的資料
+				//跳到頁面
+				that.myRole = 0;
+				that.checkLogin();
+			})
+		},
+		jumptoregist: function(){
+			const that=this;
+			let url="loginCheck.php";
+			fetch(url)
+			.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+			.then(function(data){
+				//調整local的變數
+				that.Cid = 4; // Role 變 4
+				that.checkLogin();
+			})
+		}
+	},
+	created() {
+		this.checkLogin();
+	}
+}).mount("#main");
+
+</script>
+</body></html>
