@@ -151,12 +151,14 @@
       </div>
       <table border=1>
         <tr>
-          <td>訂單編號</td><td>客戶編號</td><td>金額</td><td>狀態</td><td>對商家滿意度</td><td>-</td><td>-</td>
+          <td>訂單編號</td><td>客戶編號</td><td>商品名稱</td><td>數量</td><td>金額</td><td>狀態</td><td>對商家滿意度</td><td>-</td><td>-</td>
         </tr>
         <!-- array : orders -->
         <tr v-for="order in orders"> 
-          <td>{{order.id}}</td>
+          <td>{{order.OrderID}}</td>
           <td>{{order.custID}}</td>
+          <td>{{order.name}}</td>
+          <td>{{order.quantity}}</td>
           <td>{{order.price}}</td>
           <td>{{order.status}}</td>
           <td>
