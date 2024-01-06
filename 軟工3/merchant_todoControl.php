@@ -2,9 +2,12 @@
 require('merchant_todoModel.php');
 
 $act=$_REQUEST['act'];
+
+ // Add this line to get the merchantID from the request
 switch ($act) {
     case "listproduct":
-        $products = getproductList();
+        $merchantID = (int)$_REQUEST['merchantID'];
+        $products = getproductList($merchantID);
         echo json_encode($products);
         return;
     case "addproduct":
@@ -27,12 +30,14 @@ switch ($act) {
         return;
     
     case "Notprocessed":
-        $status=getNotprocessed(); //--> todoModel的Notprocessed()做資料庫的資料處理
+        $merchantID = (int)$_REQUEST['merchantID'];
+        $status=getNotprocessed($merchantID); //--> todoModel的Notprocessed()做資料庫的資料處理
         echo json_encode($status);
         return;    
 
     case "processing":
-        $status=getprocessing(); //--> todoModel的processed()做資料庫的資料處理
+        $merchantID = (int)$_REQUEST['merchantID'];
+        $status=getprocessing($merchantID); //--> todoModel的processed()做資料庫的資料處理
         echo json_encode($status);
         return; 
     

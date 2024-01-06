@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主機： 127.0.0.1
--- 產生時間： 2024-01-05 11:33:29
+-- 產生時間： 2023-12-30 15:17:01
 -- 伺服器版本： 10.4.24-MariaDB
 -- PHP 版本： 8.1.6
 
@@ -18,42 +18,30 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- 資料庫： `commodity`
+-- 資料庫： `mvc`
 --
 
 -- --------------------------------------------------------
 
 --
--- 資料表結構 `list`
+-- 資料表結構 `member`
 --
 
-CREATE TABLE `list` (
+CREATE TABLE `member` (
   `id` int(11) NOT NULL,
-  `custID` int(11) NOT NULL,
-  `merchantID` int(11) NOT NULL,
-  `OrderID` int(11) NOT NULL,
-  `name` varchar(50) NOT NULL,
-  `quantity` int(11) NOT NULL,
-  `price` int(11) NOT NULL,
-  `status` varchar(50) NOT NULL,
-  `evaluate` int(11) NOT NULL
+  `Cid` int(11) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- 傾印資料表的資料 `list`
---
-
-INSERT INTO `list` (`id`, `custID`, `merchantID`, `OrderID`, `name`, `quantity`, `price`, `status`, `evaluate`) VALUES
-(1, 1, 0, 0, '', 0, 1, '已送達', 0);
 
 --
 -- 已傾印資料表的索引
 --
 
 --
--- 資料表索引 `list`
+-- 資料表索引 `member`
 --
-ALTER TABLE `list`
+ALTER TABLE `member`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -61,10 +49,10 @@ ALTER TABLE `list`
 --
 
 --
--- 使用資料表自動遞增(AUTO_INCREMENT) `list`
+-- 使用資料表自動遞增(AUTO_INCREMENT) `member`
 --
-ALTER TABLE `list`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+ALTER TABLE `member`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

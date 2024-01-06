@@ -3,15 +3,15 @@ require('logistics_todoModel.php');
 
 $act=$_REQUEST['act'];
 switch ($act) {
-    case "shipping"://列出寄送中清單
+    case "shipping":
         $status = shipping();
         echo json_encode($status);
         return;
-
-    case "Notdelivered"://列出已寄送清單
+    
+    case "Notdelivered":
         $status = Notdelivered();
         echo json_encode($status);
-        return;
+        return;    
 
     case "updatestatus":
         $id=(int)$_REQUEST['id'];

@@ -1,18 +1,20 @@
 <?php
 require('dbconfig.php');
 
-function getproductList() {
-	global $db;
-	$sql = "select * from commodity;";
-	$stmt = mysqli_prepare($db, $sql ); //precompile sql指令，建立statement 物件，以便執行SQL
-	mysqli_stmt_execute($stmt); //執行SQL
-	$result = mysqli_stmt_get_result($stmt); //取得查詢結果
+function getproductList($merchantID) {
+    global $db;
+    // Modify the SQL query to include the merchantID condition
+    $sql = "select * from commodity where merchantID = ?;";
+    $stmt = mysqli_prepare($db, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $merchantID);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
 
-	$rows = array(); //要回傳的陣列
-	while($r = mysqli_fetch_assoc($result)) {
-		$rows[] = $r; //將此筆資料新增到陣列中
-	}
-	return $rows;
+    $rows = array();
+    while ($r = mysqli_fetch_assoc($result)) {
+        $rows[] = $r;
+    }
+    return $rows;
 }
 
 function addproduct($name,$illustrate,$price,$id) {
@@ -45,11 +47,12 @@ function delproduct($id) {
 	return True;
 }
 
-function getNotprocessed()
+function getNotprocessed($merchantID)
 {
     global $db;
-    $sql = "select id,custID,price, status from list where status='未處理';";
+    $sql = "select * from list where status='未處理'and merchantID=?;";
     $stmt = mysqli_prepare($db, $sql);
+	mysqli_stmt_bind_param($stmt, "i", $merchantID);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
 
@@ -60,11 +63,12 @@ function getNotprocessed()
     return $rows;
 }
 
-function getProcessing()
+function getProcessing($merchantID)
 {
     global $db;
-    $sql = "select id,custID,price, status from list where status='處理中';";
+    $sql = "select * from list where status='處理中'and merchantID=?;";
     $stmt = mysqli_prepare($db, $sql);
+	mysqli_stmt_bind_param($stmt, "i", $merchantID);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
 
@@ -93,6 +97,30 @@ function updatestatus2($id) {
 	mysqli_stmt_bind_param($stmt, "i",$id); 
 	mysqli_stmt_execute($stmt);  //執行SQL
 	return True;
+}
+
+function getCustID() {
+    global $db;
+
+    $username = 'charlie';
+
+    $sql = "SELECT id, username FROM member WHERE username = ? LIMIT 1";
+
+    $stmt = mysqli_prepare($db, $sql);
+    mysqli_stmt_bind_param($stmt, "s", $username);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_bind_result($stmt, $custID, $resultUsername);
+
+    if (mysqli_stmt_fetch($stmt)) {
+        mysqli_stmt_close($stmt);
+        $result = ['id' => $custID, 'username' => $resultUsername];
+        echo json_encode($result); // 返回 JSON 格式
+        return $result;
+    } else {
+        mysqli_stmt_close($stmt);
+        echo json_encode(['error' => '未獲取到有效的custID']); // 返回 JSON 格式
+        return false;
+    }
 }
 
 ?>

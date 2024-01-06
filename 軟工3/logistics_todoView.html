@@ -2,24 +2,52 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="https://unpkg.com/vue@3.0.11"></script>
   <style>
-    th, td {
-      text-align: center; /* 文本置中 */
-    }
+   #main {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        button {
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
   </style>
 </head>
 
 <body >
 
-<hr />
+
 <div id = "main">
+	<h1>物流</h1>
+	<hr />
 <div id="shipping" v-if="UI=='main'">
 	<h1>寄送中清單</h1>
 	<button @click="setUINotdelivered('Notdelivered')">查看已寄送訂單</button>
 	<table border=1>
-		<tr><td>序號</td><td>顧客序號</td><td>商品價格</td><td>狀態</td><td>-</td></tr>
+		<tr><td>序號</td><td>顧客序號</td><td>商家序號</td><td>訂單序號</td><td>商品名稱</td><td>商品數量</td><td>商品價格</td><td>狀態</td><td>-</td></tr>
 		<tr v-for="status in list">
 			<td>{{status.id}}</td>
 			<td>{{status.custID}}</td>
+			<td>{{status.merchantID}}</td>
+			<td>{{status.OrderID}}</td>
+			<td>{{status.name}}</td>
+			<td>{{status.quantity}}</td>
 			<td>{{status.price}}</td>
 			<td>{{status.status}}</td>
 			<td><button @click="setEditshipping(status.id)">更改為已寄送</button></td>
@@ -32,10 +60,14 @@
 	<h1>已寄送訂單</h1>
 	<button @click="setUI('main')">查看寄送中清單</button>
 	<table border=1>
-		<tr><td>序號</td><td>顧客序號</td><td>商品價格</td><td>狀態</td><td>-</td></tr>
+		<tr><td>序號</td><td>顧客序號</td><td>商家序號</td><td>訂單序號</td><td>商品名稱</td><td>商品數量</td><td>商品價格</td><td>狀態</td><td>-</td></tr>
 		<tr v-for="status in list">
 			<td>{{status.id}}</td>
 			<td>{{status.custID}}</td>
+			<td>{{status.merchantID}}</td>
+			<td>{{status.OrderID}}</td>
+			<td>{{status.name}}</td>
+			<td>{{status.quantity}}</td>
 			<td>{{status.price}}</td>
 			<td>{{status.status}}</td>
 			<td><button @click="setEditNotdelivered(status.id)">更改為已送達</button></td>
@@ -56,32 +88,30 @@ const todoApp = Vue.createApp({
 		}
 	},
 	methods: {
-		loadList: function() {//寄送中清單瀏覽
-			const that = this; //this  ==> stands for vm6. let's save `this` to `that`
-		//向URL發出request
-			fetch('logistics_todoControl.php?act=shipping')
+		shipping: function() {
+		const that = this;
+		fetch('logistics_todoControl.php?act=shipping')
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(myJson) {
+            that.list = myJson;
+			
+        });
+	},
+		Notdelivered: function() {
+		const that = this;
+		fetch('logistics_todoControl.php?act=Notdelivered')
 			.then(function(response) {
-				return response.json();
-			})
-			.then(function(myJson) {
-				//we are inside the callback function, now `this` means the function, not vm6
-				//we will use `that` to access vm6
+            return response.json();
+        })
+        .then(function(myJson) {
+            console.log(myJson);
+            that.list = myJson;
+			
+        });
+	},
 
-				that.list = myJson;
-				//todoApp.dat = myJson;
-			});
-		},
-		Notdelivered: function () { //已寄送清單瀏覽
-			const that = this;
-			fetch('logistics_todoControl.php?act=Notdelivered') // --> 
-			.then(function(response) {
-			return response.json();
-			})
-			.then(function(myJson) {
-			console.log(myJson);
-			that.list = myJson;
-			});
-        },
        
 		setEditshipping: function(status) {//更改為已寄送
 			const that=this;
@@ -96,6 +126,7 @@ const todoApp = Vue.createApp({
 			.then(function(myJson) {
 			console.log(myJson);
 			that.list = myJson;
+			that.shipping();
 			});
 		},
 		setEditNotdelivered: function(status) {//更改為已送達
@@ -111,22 +142,24 @@ const todoApp = Vue.createApp({
 			.then(function(myJson) {
 			console.log(myJson);
 			that.list = myJson;
+			that.Notdelivered();
 			});
 		},
 
 		
 
-		setUI: function(page) {
+		setUI: function(page) {//查看寄送中清單
 			this.UI=page;
+			this.shipping();
 			
 		},
-		setUINotdelivered: function(page) {
+		setUINotdelivered: function(page) {//查看已寄送清單
 			this.UI=page;
 			this.Notdelivered();
 		},
 	},
 	created() {
-		this.loadList();
+		this.shipping();
 		
 	}
 }).mount("#main");
