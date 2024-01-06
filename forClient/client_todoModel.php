@@ -117,6 +117,7 @@ function delCart($id, $custID) {
 
 function checkout($custID) {
     global $db;
+    $orderID = getOrderID();
 
     $cartList = getCartList($custID);
 
@@ -124,17 +125,28 @@ function checkout($custID) {
         echo json_encode(['success' => false, 'message' => '購物車內容為空，無法結帳']);
         return false;
     }
+    
+    $distinctSQL = "SELECT DISTINCT merchantID FROM cart;"; // 分類出有幾個商家
+    $stmtDistinct = mysqli_prepare($db, $distinctSQL);
+    mysqli_stmt_execute($stmtDistinct);
+    $merchants = mysqli_stmt_get_result($stmtDistinct);
 
-    $totalPrice = 0;
-    foreach ($cartList as $item) {
-        $totalPrice += $item['price'] * $item['quantity'];
+    while ($merchant = mysqli_fetch_assoc($merchants)) { // 找出各商家的訂單
+        $selectSQL = "SELECT * FROM cart WHERE merchantID = ?;";
+        $stmtSelect = mysqli_prepare($db, $selectSQL);
+        mysqli_stmt_bind_param($stmtSelect, "i", $merchant['merchantID']);
+        mysqli_stmt_execute($stmtSelect);
+        $orders = mysqli_stmt_get_result($stmtSelect);
+        while ($order = mysqli_fetch_assoc($orders)) { // 找出各商家訂單中的各個商品
+            $totalPrice = $order['price'] * $order['quantity'];
+            $insertOrderSQL = "INSERT INTO `list` (custID, merchantID, OrderID, name, quantity, price, status, evaluate) VALUES (?, ?, ?, ?, ?, ?, '未處理', 0)";
+            $stmt = mysqli_prepare($db, $insertOrderSQL);
+            mysqli_stmt_bind_param($stmt, "iiisii", $custID, $order['merchantID'], $orderID, $order['name'], $order['quantity'], $totalPrice);
+            $result = mysqli_stmt_execute($stmt);
+        }
+
     }
-
-    $insertOrderSQL = "INSERT INTO `list` (custID, price, status, evaluate) VALUES (?, ?, '未處理', 0)";
-    $stmt = mysqli_prepare($db, $insertOrderSQL);
-    mysqli_stmt_bind_param($stmt, "ii", $custID, $totalPrice);
-    $result = mysqli_stmt_execute($stmt);
-
+    
     if ($result) {
         clearCart($custID);
         echo json_encode(['success' => true, 'message' => '結帳成功']);
@@ -194,5 +206,23 @@ function completeOrder($orderId) {
     $stmt = mysqli_prepare($db, $update_sql);
     mysqli_stmt_bind_param($stmt, "i", $orderId);
     mysqli_stmt_execute($stmt);
+}
+
+function getOrderID() {
+    global $db;
+
+    $select_sql = "SELECT MAX(OrderID) FROM `list`;";
+    $stmt = mysqli_prepare($db, $select_sql);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_bind_result($stmt, $maxID);
+    mysqli_stmt_fetch($stmt);
+    mysqli_stmt_close($stmt);
+
+    // 检查 $maxID 是否为 NULL
+    if (is_null($maxID)) {
+        return 1; // 如果为 NULL，则返回 1
+    } else {
+        return $maxID + 1; // 否则返回 $maxID + 1
+    }
 }
 ?>
