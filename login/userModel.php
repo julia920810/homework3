@@ -45,13 +45,29 @@ function getid($username,$password) {
 function register($username,$password,$Cid) {
 	global $db;
 
-
 	$sql = "insert into member (username,password,Cid) values (?, ?,?)"; 
 	$stmt = mysqli_prepare($db, $sql); //prepare sql statement
 	mysqli_stmt_bind_param($stmt, "ssi", $username,$password,$Cid); 
 	mysqli_stmt_execute($stmt);  //執行SQL
 
-	return True;
+	return true;
+}
+
+function checkregist($username) {
+	global $db;
+
+	$sql = "select * from member where username =?;";
+	$stmt = mysqli_prepare($db, $sql );
+	mysqli_stmt_bind_param($stmt, "s", $username);
+
+	mysqli_stmt_execute($stmt); //執行SQL
+	$result = mysqli_stmt_get_result($stmt); //取得查詢結果
+	if($r = mysqli_fetch_assoc($result)) {	
+		$r['username'];	
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 function Mregister($username,$password,$Cid) {

@@ -46,15 +46,37 @@ case 'register':
 	$jsonStr = $_POST['dat'];
     $clientdata= json_decode($jsonStr);
 
-	register($clientdata->username,$clientdata->password,$clientdata->clientrole); //use the login function in userModel
+	
+	$checkname = checkregist($clientdata->username);
 
+	if($checkname == 0){
+		register($clientdata->username,$clientdata->password,$clientdata->clientrole); //use the login function in userModel
+
+	}
+	else
+	{
+		$alert = "username已被註冊.請重新輸入.";
+		echo "<script type='text/javascript'>alert('$alert');</script>";
+	}
+	/*
+	register($clientdata->username,$clientdata->password,$clientdata->clientrole); //use the login function in userModel
 	return;
+	*/
 	break;
 case 'Mregister':
 	$jsonStr = $_POST['dat'];
     $merchantdata= json_decode($jsonStr);
 
-	Mregister($merchantdata->username,$merchantdata->password,$merchantdata->merchantrole); //use the login function in userModel
+	$checkname = checkregist($merchantdata->username);
+
+	if($checkname == 0){
+		Mregister($merchantdata->username,$merchantdata->password,$merchantdata->merchantrole); //use the login function in userModel
+	}
+	else{
+		$alert = "username已被註冊.請重新輸入.";
+		echo "<script type='text/javascript'>alert('$alert');</script>";
+	}
+	
 
 	return;
 	break;
