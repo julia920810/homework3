@@ -13,9 +13,10 @@ switch ($act) {
     case "addproduct":
 
         $jsonStr = $_POST['dat'];
+        $merchantID = (int)$_REQUEST['merchantID'];
         $products = json_decode($jsonStr);
         //verify
-        addproduct($products->name, $products->illustrate,$products->price,$product->id);
+        addproduct($products->name, $products->illustrate,$products->price,$merchantID);
         return;
     case "delproduct":
         $id = (int)$_REQUEST['id'];
