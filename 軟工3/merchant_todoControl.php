@@ -2,7 +2,7 @@
 require('merchant_todoModel.php');
 
 $act=$_REQUEST['act'];
-
+$custID = isset($_REQUEST['custID']) ? (int)$_REQUEST['custID'] : getCustID();
  // Add this line to get the merchantID from the request
 switch ($act) {
     case "listproduct":

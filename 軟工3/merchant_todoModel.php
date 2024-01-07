@@ -102,7 +102,7 @@ function updatestatus2($id) {
 function getCustID() {
     global $db;
 
-    $username = 'charlie';
+    $username = $_COOKIE['loginName'];
 
     $sql = "SELECT id, username FROM member WHERE username = ? LIMIT 1";
 

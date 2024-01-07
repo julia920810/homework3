@@ -33,91 +33,94 @@
 <body>
 
 
-<div id = "main">
+<div id = "merchForm">
 	<h1>商家</h1>
-	<p>商家您好，custID = {{userInfo.custID}}, username = {{userInfo.username}}</p>
+	<p>商家您好，custID = {{id}}, username = {{username}}</p>
+	<input type='button' @click="logout()" value="logout"/>	
 	<hr />
-<div id="list" v-if="UI=='main'">
-    <a href="initial.html">載入初始頁面</a>
-	<h1>商品清單</h1>
-	<button @click="setAddUI()">新增清單</button>
-	<button @click="setUINotprocessed('Notprocessed')">查看未處理訂單</button>
-	<button @click="setUIprocessing('processing')">查看處理中訂單</button>
-	<table border=1>
-		<tr><td>序號</td><td>商家序號</td><td>商品名稱</td><td>商品介紹</td><td>商品價格</td><td>功能</td></tr>
-		<tr v-for="products in dat">
-			<td>{{products.id}}</td>
-			<td>{{products.merchantID}}</td>
-			<td>{{products.name}}</td>
-			<td>{{products.illustrate}}</td>
-			<td>{{products.price}}</td>
-			<td><button @click="delproduct(products.id)">刪</button><button @click="setEditUI(products)">改</button></td>
-		</tr>
-	</table>
+	<div id="merchForm" v-if="UI=='merchForm'">
+		<h1>商品清單</h1>
+		<button @click="setAddUI()">新增清單</button>
+		<button @click="setUINotprocessed('Notprocessed')">查看未處理訂單</button>
+		<button @click="setUIprocessing('processing')">查看處理中訂單</button>
+		<table border=1>
+			<tr><td>序號</td><td>商家序號</td><td>商品名稱</td><td>商品介紹</td><td>商品價格</td><td>功能</td></tr>
+			<tr v-for="products in dat">
+				<td>{{products.id}}</td>
+				<td>{{products.merchantID}}</td>
+				<td>{{products.name}}</td>
+				<td>{{products.illustrate}}</td>
+				<td>{{products.price}}</td>
+				<td><button @click="delproduct(products.id)">刪</button><button @click="setEditUI(products)">改</button></td>
+			</tr>
+		</table>
 
 
-</div>
-<div v-if="UI=='Notprocessed'">
-	<h1>未處理訂單</h1>
-	<button @click="setUI('main')">返回商品介面</button>
-	<button @click="setUIprocessing('processing')">查看處理中訂單</button>
-	<table border=1>
-		<tr><td>序號</td><td>顧客序號</td><td>商家序號</td><td>訂單序號</td><td>商品名稱</td><td>商品數量</td><td>商品價格</td><td>狀態</td><td>-</td></tr>
-		<tr v-for="status in list">
-			<td>{{status.id}}</td>
-			<td>{{status.custID}}</td>
-			<td>{{status.merchantID}}</td>
-			<td>{{status.OrderID}}</td>
-			<td>{{status.name}}</td>
-			<td>{{status.quantity}}</td>
-			<td>{{status.price}}</td>
-			<td>{{status.status}}</td>
-			<td><button @click="setEditUINotprocessed(status.id)">更改為處理中</button></td>
-		</tr>
-	</table>
-</div>
-<div v-if="UI=='processing'">
-	<h1>處理中訂單</h1>
-	<button @click="setUI('main')">返回商品介面</button>
-	<button @click="setUINotprocessed('Notprocessed')">查看未處理訂單</button>
-	<table border=1>
-		<tr><td>序號</td><td>顧客序號</td><td>商家序號</td><td>訂單序號</td><td>商品名稱</td><td>商品數量</td><td>商品價格</td><td>狀態</td><td>-</td></tr>
-		<tr v-for="status in list">
-			<td>{{status.id}}</td>
-			<td>{{status.custID}}</td>
-			<td>{{status.merchantID}}</td>
-			<td>{{status.OrderID}}</td>
-			<td>{{status.name}}</td>
-			<td>{{status.quantity}}</td>
-			<td>{{status.price}}</td>
-			<td>{{status.status}}</td>
-			<td><button @click="setEditUIprocessing(status.id)">更改為寄送中</button></td>
-		</tr>
-	</table>
-</div>
-<div v-if="UI=='editForm'">
-	商品名稱: <input type="text"  v-model="newProducts.name"/> <br/>
-	商品介紹: <input type="text"  v-model="newProducts.illustrate"/> <br/>
-	商品價格: <input type="number"  v-model="newProducts.price"/> <br/>
+	</div>
+	<div v-if="UI=='Notprocessed'">
+		<h1>未處理訂單</h1>
+		<button @click="setUI2('merchForm')">返回商品介面</button>
+		<button @click="setUIprocessing('processing')">查看處理中訂單</button>
+		<table border=1>
+			<tr><td>序號</td><td>顧客序號</td><td>商家序號</td><td>訂單序號</td><td>商品名稱</td><td>商品數量</td><td>商品價格</td><td>狀態</td><td>-</td></tr>
+			<tr v-for="status in list">
+				<td>{{status.id}}</td>
+				<td>{{status.custID}}</td>
+				<td>{{status.merchantID}}</td>
+				<td>{{status.OrderID}}</td>
+				<td>{{status.name}}</td>
+				<td>{{status.quantity}}</td>
+				<td>{{status.price}}</td>
+				<td>{{status.status}}</td>
+				<td><button @click="setEditUINotprocessed(status.id)">更改為處理中</button></td>
+			</tr>
+		</table>
+	</div>
+	<div v-if="UI=='processing'">
+		<h1>處理中訂單</h1>
+		<button @click="setUI2('merchForm')">返回商品介面</button>
+		<button @click="setUINotprocessed('Notprocessed')">查看未處理訂單</button>
+		<table border=1>
+			<tr><td>序號</td><td>顧客序號</td><td>商家序號</td><td>訂單序號</td><td>商品名稱</td><td>商品數量</td><td>商品價格</td><td>狀態</td><td>-</td></tr>
+			<tr v-for="status in list">
+				<td>{{status.id}}</td>
+				<td>{{status.custID}}</td>
+				<td>{{status.merchantID}}</td>
+				<td>{{status.OrderID}}</td>
+				<td>{{status.name}}</td>
+				<td>{{status.quantity}}</td>
+				<td>{{status.price}}</td>
+				<td>{{status.status}}</td>
+				<td><button @click="setEditUIprocessing(status.id)">更改為寄送中</button></td>
+			</tr>
+		</table>
+	</div>
+	<div v-if="UI=='editForm'">
+		商品名稱: <input type="text"  v-model="newProducts.name"/> <br/>
+		商品介紹: <input type="text"  v-model="newProducts.illustrate"/> <br/>
+		商品價格: <input type="number"  v-model="newProducts.price"/> <br/>
 
-	<input type='button' @click="addproduct()" value="save">
-	<button @click="setUI('main')">返回商品介面</button>
-</div>
-<div v-if="UI=='editForm2'">
-	商品名稱: <input type="text"  v-model="newProducts.name"/> <br/>
-	商品介紹: <input type="text"  v-model="newProducts.illustrate"/> <br/>
-	商品價格: <input type="number"  v-model="newProducts.price"/> <br/>
+		<input type='button' @click="addproduct()" value="save">
+		<button @click="setUI2('merchForm')">返回商品介面</button>
+	</div>
+	<div v-if="UI=='editForm2'">
+		商品名稱: <input type="text"  v-model="newProducts.name"/> <br/>
+		商品介紹: <input type="text"  v-model="newProducts.illustrate"/> <br/>
+		商品價格: <input type="number"  v-model="newProducts.price"/> <br/>
 
-	<input type='button' @click="updateproduct()" value="save">
-	<button @click="setUI('main')">返回商品介面</button>
-</div>
+		<input type='button' @click="updateproduct()" value="save">
+		<button @click="setUI2('merchForm')">返回商品介面</button>
+	</div>
 </div>
 
 <script>
+function navigateTo(page) {
+		window.location.href = page;
+	}
 const todoApp = Vue.createApp({
 	data() {
 		return {
-			UI: 'main',
+			UI: 'merchForm',
 			dat: [],
 			list: [],
 			newProducts: {
@@ -126,10 +129,8 @@ const todoApp = Vue.createApp({
 				illustrate:'',
 				price:''
 			},
-			userInfo:{
-                custID: 1, // Default values or set based on your requirements.
-                username: ''
-			},
+            id:'',
+			username:'',
             
 			
 		}
@@ -138,7 +139,7 @@ const todoApp = Vue.createApp({
 		loadList: function() {
 			const that = this; //this  ==> stands for vm6. let's save `this` to `that`
 		//向URL發出request
-			fetch("merchant_todoControl.php?act=listproduct&merchantID="+this.userInfo.custID)
+			fetch("merchant_todoControl.php?act=listproduct&merchantID="+this.id)
 
 			.then(function(response) {
 				return response.json();
@@ -171,7 +172,7 @@ const todoApp = Vue.createApp({
 			let mydat = new FormData();
 			mydat.append( "dat", JSON.stringify(this.newProducts) );
 
-			let url="merchant_todoControl.php?act=addproduct";
+			let url="merchant_todoControl.php?act=addproduct&merchantID="+this.id;
 			fetch(url,{
 				method: 'POST',
 				body: mydat // 將表單物件放入fetch的body屬性
@@ -179,7 +180,7 @@ const todoApp = Vue.createApp({
 			.then(function(res){return res.text(); }) //取得傳回值，轉為文字
 			.then(function(data){ 
 				console.log(data);
-				that.setUI('main');
+				that.setUI2('merchForm');
 				that.loadList();
 			})
 		},
@@ -196,13 +197,13 @@ const todoApp = Vue.createApp({
 			.then(function(res){return res.text(); }) //取得傳回值，轉為文字
 			.then(function(data){ 
 				console.log(data);
-				that.setUI('main');
+				that.setUI2('merchForm');
 				that.loadList();
 			})
 		},
 		Notprocessed: function () { //未處理清單瀏覽
 			const that = this;
-			fetch("merchant_todoControl.php?act=Notprocessed&merchantID="+this.userInfo.custID) // --> 
+			fetch("merchant_todoControl.php?act=Notprocessed&merchantID="+this.id) // --> 
 			.then(function(response) {
 			return response.json();
 			})
@@ -213,7 +214,7 @@ const todoApp = Vue.createApp({
         },
 	    processing: function () { //處理中清單瀏覽
 			const that = this;
-			fetch("merchant_todoControl.php?act=processing&merchantID="+this.userInfo.custID) // --> 
+			fetch("merchant_todoControl.php?act=processing&merchantID="+this.id) // --> 
 			.then(function(response) {
 			return response.json();
 			})
@@ -224,7 +225,7 @@ const todoApp = Vue.createApp({
         },
 		setEditUI: function(products) {
 			this.newProducts=products;
-			this.setUI('editForm2');
+			this.setUI2('editForm2');
 		},
 		setAddUI: function() {
 			this.newProducts={
@@ -233,7 +234,7 @@ const todoApp = Vue.createApp({
 				illustrate: '',
 				price: ''
 			};
-			this.setUI('editForm');
+			this.setUI2('editForm');
 		},
 		setUINotprocessed: function(page) {
 			this.UI=page;
@@ -243,7 +244,7 @@ const todoApp = Vue.createApp({
 			this.UI=page;
 			this.processing();
 		},
-		setUI: function(page){
+		setUI2: function(page){
 			this.UI=page;
 			this.loadList();
 		},
@@ -279,6 +280,28 @@ const todoApp = Vue.createApp({
 			that.processing();
 			});
 		},
+		logout: function() {
+			navigateTo("loginTest.nocookie.html");
+		},
+		async fetchCustID() {
+          try {
+              const response = await fetch('merchant_todoControl.php?act=getCustID');
+              if (response.ok) {
+                  const myJson = await response.json();
+                  if (myJson.id !== undefined) {
+                      this.custID = myJson.id;
+                      this.username = myJson.username;
+                      console.log('獲取到的custID:', this.custID);
+                  } else {
+                      console.error('獲取custID失敗:', '未獲得有效的custID');
+                  }
+              } else {
+                  console.error('獲取custID失敗:', 'HTTP 錯誤: ' + response.status);
+              }
+          } catch (error) {
+              console.error('獲取custID失敗:', error);
+          }
+      },
 
 
 	},
@@ -287,7 +310,7 @@ const todoApp = Vue.createApp({
 
     
 	}
-}).mount("#main");
+}).mount("#merchForm");
 </script>
 
 </body></html>
