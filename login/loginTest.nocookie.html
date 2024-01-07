@@ -30,12 +30,22 @@
 	<input type='button' @click="logout()" value="logout"/>	
 </div>
 <!--客戶的注冊頁面 ui -->
-<div id="list" v-if="UI=='registForm'">
+<div id="list" v-if="UI=='CregistForm'">
 	<h1>這是客戶的注冊頁面.請輸入username和passward</h1>
 	<hr/>
-	ID: <input type="text"  v-model="clientdata.username"/> <br/>
+	username: <input type="text"  v-model="clientdata.username"/> <br/>
 	Password: <input type="text" v-model="clientdata.password" />
 	<input type='button' @click="register()" value="注冊"/> <br/>
+	<input type='button' @click="logout()" value="回到登入頁面"/>	
+</div>
+
+<!--商家的注冊頁面 ui -->
+<div id="list" v-if="UI=='MregistForm'">
+	<h1>這是商家的注冊頁面.請輸入username和passward</h1>
+	<hr/>
+	username: <input type="text"  v-model="merchantdata.username"/> <br/>
+	Password: <input type="text" v-model="merchantdata.password" />
+	<input type='button' @click="Mregister()" value="注冊"/> <br/>
 	<input type='button' @click="logout()" value="回到登入頁面"/>	
 </div>
 
@@ -43,10 +53,11 @@
 <div v-if="UI=='loginForm'">
 	<h1>這是登入頁面.請輸入username和passward</h1>
 	<hr/>
-	ID: <input type="text"  v-model="username"/> <br/>
+	username: <input type="text"  v-model="username"/> <br/>
 	Password: <input type="text" v-model="password" />
 	<input type='button' @click="login()" value="login"/> <br/>
 	<input type='button' @click="jumptoregist()" value="客戶注冊"/> <br/>
+	<input type='button' @click="jumptoMregist()" value="商家注冊"/> <br/>
 </div>
 	<hr/>
 	{{info}}
@@ -69,6 +80,11 @@ const todoApp= Vue.createApp({
 				password:'',
 				clientrole:'1'
 			},
+			merchantdata:{
+				username: '',
+				password:'',
+				merchantrole:'2'
+			},
 			id: '',
 			username: '',
 			password: '',
@@ -86,7 +102,7 @@ const todoApp= Vue.createApp({
 			sessionStorage.setItem('role', role)
 			console.log(role, this.login.myRole);
 			*/
-			// 以Cid 去決定不同角色的UI 0是login 1是顧客 2是商家 3是物流 4是顧客註冊 5是
+			// 以Cid 去決定不同角色的UI 0是login 1是顧客 2是商家 3是物流 4是顧客註冊 5是商家註冊
 			if (this.Cid == 0) {
 				this.setUI('loginForm');
 			} 
@@ -100,7 +116,10 @@ const todoApp= Vue.createApp({
 				this.setUI('logistForm');
 			}
 			else if(this.Cid == 4){
-				this.setUI('registForm');
+				this.setUI('CregistForm');
+			}
+			else if(this.Cid == 5){
+				this.setUI('MregistForm');
 			}
 		},
 		login: function() {
@@ -183,6 +202,39 @@ const todoApp= Vue.createApp({
 			.then(function(data){
 				//調整local的變數
 				that.Cid = 4; // Role 變 4
+				that.checkLogin();
+			})
+		},
+		Mregister: function(){
+			const that = this;
+			let mydat = new FormData();
+				// you may also use document.getElementById('loginID').value to get that field
+			mydat.append( "dat", JSON.stringify(this.merchantdata) );
+			mydat.append( "act", 'Mregister'); 
+
+			let url="loginCheck.php";
+			fetch(url,{
+					method: 'POST',
+					body: mydat // 將表單物件放入fetch的body屬性
+			})
+			.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+			.then(function(data){
+				console.log(data);
+				//server 設定的cookie,httponly:true時, client 端讀不到,使用json裡的資料
+				//跳到頁面
+				//this.setUI('loginForm');
+				that.Cid = 0;
+				that.checkLogin();
+			})
+		},
+		jumptoMregist: function(){
+			const that=this;
+			let url="loginCheck.php";
+			fetch(url)
+			.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+			.then(function(data){
+				//調整local的變數
+				that.Cid = 5; // Role 變 5
 				that.checkLogin();
 			})
 		}

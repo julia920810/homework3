@@ -50,6 +50,14 @@ case 'register':
 
 	return;
 	break;
+case 'Mregister':
+	$jsonStr = $_POST['dat'];
+    $merchantdata= json_decode($jsonStr);
+
+	Mregister($merchantdata->username,$merchantdata->password,$merchantdata->merchantrole); //use the login function in userModel
+
+	return;
+	break;
 default:
 }
 

@@ -54,5 +54,16 @@ function register($username,$password,$Cid) {
 	return True;
 }
 
+function Mregister($username,$password,$Cid) {
+	global $db;
+
+
+	$sql = "insert into member (username,password,Cid) values (?, ?,?)"; 
+	$stmt = mysqli_prepare($db, $sql); //prepare sql statement
+	mysqli_stmt_bind_param($stmt, "ssi", $username,$password,$Cid); 
+	mysqli_stmt_execute($stmt);  //執行SQL
+
+	return True;
+}
 
 ?>
