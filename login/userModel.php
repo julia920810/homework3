@@ -10,7 +10,7 @@ function login($username, $password) {
 
 	//safer way
 	
-	$sql = "select id from member where username=? and password=?;";
+	$sql = "select Cid from member where username=? and password=?;";
 	$stmt = mysqli_prepare($db, $sql );
 	mysqli_stmt_bind_param($stmt, "ss", $username, $password);
 	
@@ -18,19 +18,19 @@ function login($username, $password) {
 	mysqli_stmt_execute($stmt); //執行SQL
 	$result = mysqli_stmt_get_result($stmt); //取得查詢結果
 	if($r = mysqli_fetch_assoc($result)) {		
-		return $r['id'];
+		return $r['Cid'];
 	} else {
 		return 0;
 	}
 }
 
-function register($id, $pwd,$role) {
+function register($username,$password,$Cid) {
 	global $db;
 
 
-	$sql = "insert into user (id,pwd,role) values (?, ?,?)"; 
+	$sql = "insert into member (username,password,Cid) values (?, ?,?)"; 
 	$stmt = mysqli_prepare($db, $sql); //prepare sql statement
-	mysqli_stmt_bind_param($stmt, "sss", $id,$pwd,$role); 
+	mysqli_stmt_bind_param($stmt, "ssi", $username,$password,$Cid); 
 	mysqli_stmt_execute($stmt);  //執行SQL
 
 	return True;

@@ -9,13 +9,13 @@ case "login":
 	$password=$_REQUEST['password'];
 	//verify with DB
 
-	$id = login($username,$password); //use the login function in userModel
-	setcookie('loginRole',$id,httponly:true); //another way to restrict the cookie visibility
+	$Cid = login($username,$password); //use the login function in userModel
+	setcookie('loginRole',$Cid,httponly:true); //another way to restrict the cookie visibility
 	//setcookie('loginRole',$role); //another way to restrict the cookie visibility
-	if ($id > 0) {
+	if ($Cid > 0) {
 		$msg=[
 			"msg" => "OK",
-			"role" => $id
+			"role" => $Cid
 		];
 	} else {
 		$msg=[
@@ -44,7 +44,7 @@ case 'register':
 	$jsonStr = $_POST['dat'];
     $clientdata= json_decode($jsonStr);
 
-	register($id->clientid,$pwd->clientpwd,$role->clientrole); //use the login function in userModel
+	register($clientdata->username,$clientdata->password,$clientdata->clientrole); //use the login function in userModel
 
 	return;
 	break;
