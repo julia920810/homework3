@@ -10,12 +10,14 @@ case "login":
 	//verify with DB
 
 	$Cid = login($username,$password); //use the login function in userModel
+	$id = getid($username,$password);
 	setcookie('loginRole',$Cid,httponly:true); //another way to restrict the cookie visibility
 	//setcookie('loginRole',$role); //another way to restrict the cookie visibility
 	if ($Cid > 0) {
 		$msg=[
 			"msg" => "OK",
-			"role" => $Cid
+			"role" => $Cid,
+			"id" => $id
 		];
 	} else {
 		$msg=[

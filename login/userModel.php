@@ -22,6 +22,24 @@ function login($username, $password) {
 	} else {
 		return 0;
 	}
+	
+}
+
+function getid($username,$password) {
+	global $db;
+
+	$sql = "select id from member where username=? and password=?;";
+	$stmt = mysqli_prepare($db, $sql );
+	mysqli_stmt_bind_param($stmt, "ss", $username, $password);
+
+	mysqli_stmt_execute($stmt); //執行SQL
+	$result = mysqli_stmt_get_result($stmt); //取得查詢結果
+	if($r = mysqli_fetch_assoc($result)) {		
+		return $r['id'];
+	} else {
+		return 0;
+	}
+
 }
 
 function register($username,$password,$Cid) {
