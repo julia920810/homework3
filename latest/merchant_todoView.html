@@ -1,0 +1,386 @@
+<html><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<script type="text/javascript" src="https://unpkg.com/vue@3.0.11"></script>
+	
+	  <style>
+		body {
+		  font-family: Arial, sans-serif;
+		  background-color: #f4f4f4;
+		  margin: 0;
+		  padding: 0;
+		}
+	
+		#main {
+		  max-width: 800px;
+		  margin: 20px auto;
+		  background-color: #fff;
+		  padding: 20px;
+		  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+		}
+	
+		h1 {
+		  color: #333;
+		}
+	
+		p {
+		  color: #777;
+		}
+	
+		button {
+		  background-color: #4caf50;
+		  color: #fff;
+		  border: none;
+		  padding: 15px 15px;
+		  cursor: pointer;
+		  border-radius: 5px;
+		  margin-right: 5px;
+		}
+	
+		table {
+		  width: 100%;
+		  border-collapse: collapse;
+		  margin-top: 20px;
+		}
+	
+		th, td {
+		  border: 1px solid #ddd;
+		  padding: 10px;
+		  text-align: center;
+		}
+	
+		th {
+		  background-color: #4caf50;
+		  color: #fff;
+		}
+	
+		tr:nth-child(even) {
+		  background-color: #f9f9f9;
+		}
+	
+		input {
+		  width: 100px;
+		  padding: 5px;
+		  box-sizing: border-box;
+		  text-align: center;
+		}
+	
+		select {
+		  padding: 5px;
+		  box-sizing: border-box;
+		}
+	
+		.topbar{
+		  float: right;
+		  margin-bottom: 20px;
+		}
+	
+	
+	  </style>
+	</head>
+	
+	<body>
+	
+	
+	<div id = "merchForm">
+		<h1>商家</h1>
+		<p>商家您好，custID = {{custID}}, username = {{username}}</p>
+		<input type='button' @click="logout()" value="登出"/>	
+		<hr />
+		<div id="merchForm" v-if="UI=='merchForm'">
+			<h1>商品清單</h1>
+			<button @click="setAddUI()">新增清單</button>
+			<button @click="setUINotprocessed('Notprocessed')">查看未處理訂單</button>
+			<button @click="setUIprocessing('processing')">查看處理中訂單</button>
+			<table border=1>
+				<tr><td>序號</td><td>商家編號</td><td>商品名稱</td><td>商品介紹</td><td>商品價格</td><td>功能</td></tr>
+				<tr v-for="products in dat">
+					<td>{{products.id}}</td>
+					<td>{{products.merchantID}}</td>
+					<td>{{products.name}}</td>
+					<td>{{products.illustrate}}</td>
+					<td>{{products.price}}</td>
+					<td><button @click="delproduct(products.id)">刪</button><button @click="setEditUI(products)">改</button></td>
+				</tr>
+			</table>
+	
+	
+		</div>
+		<div v-if="UI=='Notprocessed'">
+			<h1>未處理訂單</h1>
+			<button @click="setUI2('merchForm')">返回商品介面</button>
+			<button @click="setUIprocessing('processing')">查看處理中訂單</button>
+			<table border=1>
+				<tr><td>編號</td><td>顧客編號</td><td>商家編號</td><td>訂單編號</td><td>商品名稱</td><td>商品數量</td><td>商品價格</td><td>狀態</td><td>-</td></tr>
+				<tr v-for="status in list">
+					<td>{{status.id}}</td>
+					<td>{{status.custID}}</td>
+					<td>{{status.merchantID}}</td>
+					<td>{{status.OrderID}}</td>
+					<td>{{status.name}}</td>
+					<td>{{status.quantity}}</td>
+					<td>{{status.price}}</td>
+					<td>{{status.status}}</td>
+					<td><button @click="setEditUINotprocessed(status.id)">更改為處理中</button></td>
+				</tr>
+			</table>
+		</div>
+		<div v-if="UI=='processing'">
+			<h1>處理中訂單</h1>
+			<button @click="setUI2('merchForm')">返回商品介面</button>
+			<button @click="setUINotprocessed('Notprocessed')">查看未處理訂單</button>
+			<table border=1>
+				<tr><td>編號</td><td>顧客編號</td><td>商家編號</td><td>訂單編號</td><td>商品名稱</td><td>商品數量</td><td>商品價格</td><td>狀態</td><td>-</td></tr>
+				<tr v-for="status in list">
+					<td>{{status.id}}</td>
+					<td>{{status.custID}}</td>
+					<td>{{status.merchantID}}</td>
+					<td>{{status.OrderID}}</td>
+					<td>{{status.name}}</td>
+					<td>{{status.quantity}}</td>
+					<td>{{status.price}}</td>
+					<td>{{status.status}}</td>
+					<td><button @click="setEditUIprocessing(status.id)">更改為寄送中</button></td>
+				</tr>
+			</table>
+		</div>
+		<div v-if="UI=='editForm'">
+			商品名稱: <input type="text"  v-model="newProducts.name"/> <br/>
+			商品介紹: <input type="text"  v-model="newProducts.illustrate"/> <br/>
+			商品價格: <input type="number"  v-model="newProducts.price"/> <br/>
+	
+			<input type='button' @click="addproduct()" value="save">
+			<button @click="setUI2('merchForm')">返回商品介面</button>
+		</div>
+		<div v-if="UI=='editForm2'">
+			商品名稱: <input type="text"  v-model="newProducts.name"/> <br/>
+			商品介紹: <input type="text"  v-model="newProducts.illustrate"/> <br/>
+			商品價格: <input type="number"  v-model="newProducts.price"/> <br/>
+	
+			<input type='button' @click="updateproduct()" value="save">
+			<button @click="setUI2('merchForm')">返回商品介面</button>
+		</div>
+	</div>
+	
+	<script>
+	function navigateTo(page) {
+			window.location.href = page;
+		}
+	const todoApp = Vue.createApp({
+		data() {
+			return {
+				UI: 'merchForm',
+				dat: [],
+				list: [],
+				newProducts: {
+					id: -1,
+					merchantID:'',
+					name: '',
+					illustrate:'',
+					price:''
+				},
+				custID: null,
+				username:null,
+				
+				
+			}
+		},
+		methods: {
+			loadList: function() {
+				const that = this;
+				let url = "merchant_todoControl.php?act=listproduct&merchantID=" + this.custID;
+
+				fetch(url)
+				.then(function(response) {
+            		return response.text();  // 将响应的数据转换为文本
+        		})
+        		.then(function(data) {
+            		// 输出解析前的数据
+            		console.log('Received data:', data);
+           		 	// 选择解析后的 JSON 数组部分
+            		const jsonArray = JSON.parse(data.substring(data.indexOf('[')));
+            		console.log(jsonArray); // 输出解析后的 JSON 数据
+            		that.dat = jsonArray;
+        		})
+        		.catch(function(error) {
+            		console.error('Error during JSON parsing:', error);
+        		});
+			},
+
+	
+			delproduct:function (id) {
+				const that = this;
+				let url="merchant_todoControl.php?act=delproduct&id="+id;
+				fetch(url,{
+				method: 'POST'
+				})
+				.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+				.then(function(data){ 
+				console.log(data);
+				that.loadList();
+				})
+	
+			},
+	
+			addproduct :function() {
+				const that=this;
+				let mydat = new FormData();
+				mydat.append( "dat", JSON.stringify(this.newProducts) );
+	
+				let url="merchant_todoControl.php?act=addproduct&merchantID="+this.custID;
+				fetch(url,{
+					method: 'POST',
+					body: mydat // 將表單物件放入fetch的body屬性
+				})
+				.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+				.then(function(data){ 
+					console.log(data);
+					that.setUI2('merchForm');
+					that.loadList();
+				})
+			},
+			updateproduct :function() {
+				const that=this;
+				let mydat = new FormData();
+				mydat.append( "dat", JSON.stringify(this.newProducts) );
+	
+				let url="merchant_todoControl.php?act=updateproduct&id="+this.newProducts.id;
+				fetch(url,{
+					method: 'POST',
+					body: mydat // 將表單物件放入fetch的body屬性
+				})
+				.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+				.then(function(data){ 
+					console.log(data);
+					that.setUI2('merchForm');
+					that.loadList();
+				})
+			},
+			Notprocessed: function () { //未處理清單瀏覽
+				const that = this;
+				fetch("merchant_todoControl.php?act=Notprocessed&merchantID="+this.custID) // --> 
+				.then(function(response) {
+				return response.text();
+				})
+				.then(function(data) {
+            		// 输出解析前的数据
+            		console.log('Received data:', data);
+           		 	// 选择解析后的 JSON 数组部分
+            		const jsonArray = JSON.parse(data.substring(data.indexOf('[')));
+            		console.log(jsonArray); // 输出解析后的 JSON 数据
+            		that.list = jsonArray;
+        		})
+        		.catch(function(error) {
+            		console.error('Error during JSON parsing:', error);
+        		});
+			},
+			processing: function () { //處理中清單瀏覽
+				const that = this;
+				fetch("merchant_todoControl.php?act=processing&merchantID="+this.custID) // --> 
+				.then(function(response) {
+					return response.text();
+				})
+				.then(function(data) {
+            		// 输出解析前的数据
+            		console.log('Received data:', data);
+           		 	// 选择解析后的 JSON 数组部分
+            		const jsonArray = JSON.parse(data.substring(data.indexOf('[')));
+            		console.log(jsonArray); // 输出解析后的 JSON 数据
+            		that.list = jsonArray;
+        		})
+        		.catch(function(error) {
+            		console.error('Error during JSON parsing:', error);
+        		});
+			},
+			setEditUI: function(products) {
+				this.newProducts=products;
+				this.setUI2('editForm2');
+			},
+			setAddUI: function() {
+				this.newProducts={
+					id: -1,
+					name: '',
+					illustrate: '',
+					price: ''
+				};
+				this.setUI2('editForm');
+			},
+			setUINotprocessed: function(page) {
+				this.UI=page;
+				this.Notprocessed();
+			},
+			setUIprocessing: function(page) {
+				this.UI=page;
+				this.processing();
+			},
+			setUI2: function(page){
+				this.UI=page;
+				this.loadList();
+			},
+			setEditUINotprocessed: function(status) {
+				const that=this;
+				let mydat = new FormData();
+	
+				let url="merchant_todoControl.php?act=updatestatus&id="+status;
+				fetch(url,{
+					method: 'POST',
+					body: mydat // 將表單物件放入fetch的body屬性
+				})
+				.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+				.then(function(myJson) {
+				console.log(myJson);
+				that.list = myJson;
+				that.Notprocessed();
+				});
+			},
+			setEditUIprocessing: function(status) {
+				const that=this;
+				let mydat = new FormData();
+	
+				let url="merchant_todoControl.php?act=updatestatus2&id="+status;
+				fetch(url,{
+					method: 'POST',
+					body: mydat // 將表單物件放入fetch的body屬性
+				})
+				.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+				.then(function(myJson) {
+				console.log(myJson);
+				that.list = myJson;
+				that.processing();
+				});
+			},
+			logout: function() {
+				navigateTo("loginTest.nocookie.html");
+			},
+			async fetchCustID() {
+			  try {
+				  const response = await fetch('merchant_todoControl.php?act=getCustID');
+				  if (response.ok) {
+					  const myJson = await response.json();
+					  if (myJson.id !== undefined) {
+						  this.custID = myJson.id;
+						  this.username = myJson.username;
+						  console.log('獲取到的custID:', this.custID);
+					  } else {
+						  console.error('獲取custID失敗:', '未獲得有效的custID');
+					  }
+				  } else {
+					  console.error('獲取custID失敗:', 'HTTP 錯誤: ' + response.status);
+				  }
+			  } catch (error) {
+				  console.error('獲取custID失敗:', error);
+			  }
+		  },
+	
+	
+		},
+		async created() {
+			await this.fetchCustID();
+			this.loadList();
+			
+			console.log('Created - custID:', this.custID);
+			},
+	}).mount("#merchForm");
+	</script>
+	
+	</body></html>
+	

@@ -1,0 +1,217 @@
+<html><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<script type="text/javascript" src="https://unpkg.com/vue@3.0.11"></script>
+	  <style>
+	   body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    #main {
+      max-width: 800px;
+      margin: 20px auto;
+      background-color: #fff;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    p {
+      color: #777;
+    }
+
+    button {
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-right: 5px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #4caf50;
+      color: #fff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    input {
+      width: 100px;
+      padding: 5px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    select {
+      padding: 5px;
+      box-sizing: border-box;
+    }
+
+	  </style>
+	</head>
+	
+	<body >
+	
+	
+	<div id = "main">
+		<h1>物流</h1>
+		<input type='button' @click="logout()" value="登出"/>
+		<hr />
+	<div id="shipping" v-if="UI=='main'">
+		<h1>寄送中清單</h1>
+		<button @click="setUINotdelivered('Notdelivered')">查看已寄送訂單</button>
+		<table border=1>
+			<tr><td>編號</td><td>顧客編號</td><td>商家編號</td><td>訂單編號</td><td>商品名稱</td><td>商品數量</td><td>商品價格</td><td>狀態</td><td>-</td></tr>
+			<tr v-for="status in list">
+				<td>{{status.id}}</td>
+				<td>{{status.custID}}</td>
+				<td>{{status.merchantID}}</td>
+				<td>{{status.OrderID}}</td>
+				<td>{{status.name}}</td>
+				<td>{{status.quantity}}</td>
+				<td>{{status.price}}</td>
+				<td>{{status.status}}</td>
+				<td><button @click="setEditshipping(status.id)">更改為已寄送</button></td>
+			</tr>
+		</table>
+	
+	
+	</div>
+	<div id="Notdelivered" v-if="UI=='Notdelivered'">
+		<h1>已寄送訂單</h1>
+		<button @click="setUI('main')">查看寄送中清單</button>
+		<table border=1>
+			<tr><td>編號</td><td>顧客編號</td><td>商家編號</td><td>訂單編號</td><td>商品名稱</td><td>商品數量</td><td>商品價格</td><td>狀態</td><td>-</td></tr>
+			<tr v-for="status in list">
+				<td>{{status.id}}</td>
+				<td>{{status.custID}}</td>
+				<td>{{status.merchantID}}</td>
+				<td>{{status.OrderID}}</td>
+				<td>{{status.name}}</td>
+				<td>{{status.quantity}}</td>
+				<td>{{status.price}}</td>
+				<td>{{status.status}}</td>
+				<td><button @click="setEditNotdelivered(status.id)">更改為已送達</button></td>
+			</tr>
+		</table>
+	</div>
+	
+	
+	</div>
+	
+<script>
+function navigateTo(page) {
+		window.location.href = page;
+	}	
+	const todoApp = Vue.createApp({
+		data() {
+			return {
+				UI: 'main',
+				list: [],
+				
+			}
+		},
+		methods: {
+			shipping: function() {
+			const that = this;
+			fetch('logistics_todoControl.php?act=shipping')
+			.then(function(response) {
+				return response.json();
+			})
+			.then(function(myJson) {
+				that.list = myJson;
+				
+			});
+			},
+			Notdelivered: function() {
+			const that = this;
+			fetch('logistics_todoControl.php?act=Notdelivered')
+				.then(function(response) {
+				return response.json();
+			})
+			.then(function(myJson) {
+				console.log(myJson);
+				that.list = myJson;
+				
+			});
+			},
+	
+		   
+			setEditshipping: function(status) {//更改為已寄送
+				const that=this;
+				let mydat = new FormData();
+	
+				let url="logistics_todoControl.php?act=updatestatus&id="+status;
+				fetch(url,{
+					method: 'POST',
+					body: mydat // 將表單物件放入fetch的body屬性
+				})
+				.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+				.then(function(myJson) {
+				console.log(myJson);
+				that.list = myJson;
+				that.shipping();
+				});
+			},
+			setEditNotdelivered: function(status) {//更改為已送達
+				const that=this;
+				let mydat = new FormData();
+	
+				let url="logistics_todoControl.php?act=updatestatus2&id="+status;
+				fetch(url,{
+					method: 'POST',
+					body: mydat // 將表單物件放入fetch的body屬性
+				})
+				.then(function(res){return res.text(); }) //取得傳回值，轉為文字
+				.then(function(myJson) {
+				console.log(myJson);
+				that.list = myJson;
+				that.Notdelivered();
+				});
+			},
+	
+			
+	
+			setUI: function(page) {//查看寄送中清單
+				this.UI=page;
+				this.shipping();
+				
+			},
+			setUINotdelivered: function(page) {//查看已寄送清單
+				this.UI=page;
+				this.Notdelivered();
+			},
+			logout: function() {
+			navigateTo("loginTest.nocookie.html");
+			},
+		},
+		
+		created() {
+			this.shipping();
+			
+		}
+	}).mount("#main");
+</script>
+	
+</body></html>
