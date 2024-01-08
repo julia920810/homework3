@@ -86,7 +86,7 @@
 		<h1>寄送中清單</h1>
 		<button @click="setUINotdelivered('Notdelivered')">查看已寄送訂單</button>
 		<table border=1>
-			<tr><td>序號</td><td>顧客序號</td><td>商家序號</td><td>訂單序號</td><td>商品名稱</td><td>商品數量</td><td>商品價格</td><td>狀態</td><td>-</td></tr>
+			<tr><td>編號</td><td>顧客編號</td><td>商家編號</td><td>訂單編號</td><td>商品名稱</td><td>商品數量</td><td>商品價格</td><td>狀態</td><td>-</td></tr>
 			<tr v-for="status in list">
 				<td>{{status.id}}</td>
 				<td>{{status.custID}}</td>
@@ -106,7 +106,7 @@
 		<h1>已寄送訂單</h1>
 		<button @click="setUI('main')">查看寄送中清單</button>
 		<table border=1>
-			<tr><td>序號</td><td>顧客序號</td><td>商家序號</td><td>訂單序號</td><td>商品名稱</td><td>商品數量</td><td>商品價格</td><td>狀態</td><td>-</td></tr>
+			<tr><td>編號</td><td>顧客編號</td><td>商家編號</td><td>訂單編號</td><td>商品名稱</td><td>商品數量</td><td>商品價格</td><td>狀態</td><td>-</td></tr>
 			<tr v-for="status in list">
 				<td>{{status.id}}</td>
 				<td>{{status.custID}}</td>
