@@ -88,7 +88,8 @@
   <div id="main">
     <div id="list" v-if="UI=='main'">
       <h1>商品瀏覽介面</h1>
-      <p>使用者您好，custID = {{custID}}, username = {{username}}</p>
+      <p>使用者您好,custID = {{custID}}, username = {{username}}</p> 
+      <input type='button' @click="logout()" value="登出"/>
       <div class="topbar">
         <button @click="setUI('checkCart')">查看購物車</button>
         <button @click="setUI('orderView')">查看訂單</button>
@@ -151,12 +152,64 @@
       </div>
       <table border=1>
         <tr>
-          <td>訂單編號</td><td>客戶編號</td><td>商品名稱</td><td>數量</td><td>金額</td><td>狀態</td><td>對商家滿意度</td><td>-</td><td>-</td>
+          <td>訂單編號</td><td>客戶編號</td><td>商家編號</td><td>商品名稱</td><td>數量</td><td>金額</td><td>狀態</td><td>對商家滿意度</td><td>-</td><td>-</td>
         </tr>
         <!-- array : orders -->
         <tr v-for="order in orders"> 
           <td>{{order.OrderID}}</td>
           <td>{{order.custID}}</td>
+          <td>{{order.merchantID}}</td>
+          <td>{{order.name}}</td>
+          <td>{{order.quantity}}</td>
+          <td>{{order.price}}</td>
+          <td>{{order.status}}</td>
+          <td>
+            <!-- 使用條件判斷式，只有在訂單狀態為已完成時才顯示評價選項 -->
+            <span v-if="order.status === '已完成'">
+              <!-- 利用商品瀏覽介面的數量選取方法來提交評價 -->
+              <span v-if="order.evaluate === 0">
+                尚未評分
+              </span>
+              <!-- 若評價不為0，顯示評價分數 -->
+              <span v-else>{{order.evaluate}}分</span>
+            </span>
+            <!-- 若訂單狀態不是已完成，顯示提示訊息 -->
+            <span v-else>尚未完成</span>
+          </td>
+          <!-- 提交評價按鈕 -->
+          <td>
+            <button @click="orderEvaluate(order.OrderID, order.merchantID); setUI('orderEvaluate')">評分</button>
+          </td>
+          <!-- 新增完成訂單的按鈕 -->
+          <!-- 完成訂單按鈕 -->
+          <td>
+            <button
+              :class="{ 'disabled-button': isButtonDisabled(order, 'complete') }"
+              @click="confirmCompleteOrder(order.id)"
+              :disabled="isButtonDisabled(order, 'complete')"
+            >
+              完成訂單
+            </button>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <!-- 商品滿意度介面 -->
+    <div v-if="UI=='orderEvaluate'">
+      <h1>商品滿意度介面</h1>
+      <div class="topbar">
+        <!-- 返回商品瀏覽介面 -->
+        <button @click="setUI('main')">返回商品介面</button>
+      </div>
+      <table border=1>
+        <tr>
+          <td>訂單編號</td><td>客戶編號</td><td>商家編號</td><td>商品名稱</td><td>數量</td><td>金額</td><td>狀態</td><td>對商家滿意度</td><td>-</td>
+        </tr>
+        <!-- array : orders -->
+        <tr v-for="order in ordersEvaluate"> 
+          <td>{{order.OrderID}}</td>
+          <td>{{order.custID}}</td>
+          <td>{{order.merchantID}}</td>
           <td>{{order.name}}</td>
           <td>{{order.quantity}}</td>
           <td>{{order.price}}</td>
@@ -184,27 +237,19 @@
           <td>
             <button
               :class="{ 'disabled-button': isButtonDisabled(order, 'evaluate') }"
-              @click="confirmSubmitEvaluation(order.id)"
+              @click="confirmSubmitEvaluation(order.id, order.OrderID, order.merchantID); setUI('main')"
               :disabled="isButtonDisabled(order, 'evaluate')"
             >
               提交
-            </button>
-          </td>
-          <!-- 新增完成訂單的按鈕 -->
-          <!-- 完成訂單按鈕 -->
-          <td>
-            <button
-              :class="{ 'disabled-button': isButtonDisabled(order, 'complete') }"
-              @click="confirmCompleteOrder(order.id)"
-              :disabled="isButtonDisabled(order, 'complete')"
-            >
-              完成訂單
             </button>
           </td>
         </tr>
       </table>
     </div>
   <script>
+    function navigateTo(page) {
+      window.location.href = page;
+    }
     const todoApp = Vue.createApp({
       data() {
         return {
@@ -212,6 +257,7 @@
           dat: [],
           cart: [],
           orders: [],
+          ordersEvaluate: [],
           custID: null,
           selectedEvaluation: 0,
           orderEvaluations: {},
@@ -331,7 +377,25 @@
               that.loadList();
               that.checkCart();
           });
-      },
+        },
+        orderEvaluate(orderID, merchantID){
+          const that = this;
+          fetch('client_todoControl.php?act=orderEvaluate&custID=' + this.custID + '&orderID=' + orderID + '&merchantID=' + merchantID)
+          .then(function(response) {
+            return response.text();
+                    })
+          .then(function(data) {
+              console.log(data); // 输出错误前的数据
+              return JSON.parse(data);
+          })
+          .then(function(myJson) {
+              console.log(myJson); // 输出解析后的 JSON 数据
+              that.ordersEvaluate = myJson;
+          })
+          .catch(function(error) {
+              console.error('Error during JSON parsing:', error);
+          });
+        },
         confirmAddToCart(id, quantity) {
           const isConfirmed = window.confirm('確定要將商品加入購物車嗎？');
           if (isConfirmed) {
@@ -350,10 +414,10 @@
             this.checkList(); 
           }
         },
-        confirmSubmitEvaluation(orderId) {
+        confirmSubmitEvaluation(orderId, OrderID, merchantID) {
           const isConfirmed = window.confirm('確定要提交評價嗎？');
           if (isConfirmed) {
-            this.submitEvaluation(orderId, this.selectedEvaluation);
+            this.submitEvaluation(orderId, OrderID, merchantID, this.selectedEvaluation);
           }
         },
         confirmCompleteOrder(orderId) {
@@ -386,7 +450,10 @@
             this.checkOrder();
           }.bind(this));
         },
-        async submitEvaluation(orderId) {
+        logout: function() {
+				  navigateTo("loginTest.nocookie.html");
+			  },
+        async submitEvaluation(orderId, OrderID, merchantID) {
           const that = this;
           const evaluation = that.orderEvaluations[orderId];
 
@@ -396,7 +463,7 @@
           };
 
           try {
-            const response = await fetch('client_todoControl.php?act=submitEvaluation&orderId=' + orderId + '&evaluation=' + evaluation, {
+            const response = await fetch('client_todoControl.php?act=submitEvaluation&orderId=' + orderId + '&evaluation=' + evaluation + '&OrderID=' + OrderID + '&merchantID=' + merchantID, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',

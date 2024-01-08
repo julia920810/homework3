@@ -166,19 +166,19 @@ function clearCart($custID) {
     mysqli_stmt_execute($stmt);
 }
 
-function submitEvaluation($orderId, $evaluation) {
+function submitEvaluation($evaluation, $orderID, $merchantID, $custID) {
     global $db;
 
-    $update_sql = "UPDATE `list` SET evaluate = ? WHERE id = ?";
+    $update_sql = "UPDATE `list` SET evaluate = ? WHERE orderID = ? AND merchantID = ? AND custID = ? AND status = '已完成'";
     $stmt = mysqli_prepare($db, $update_sql);
-    mysqli_stmt_bind_param($stmt, "ii", $evaluation, $orderId);
+    mysqli_stmt_bind_param($stmt, "iiii", $evaluation, $orderID, $merchantID, $custID);
     mysqli_stmt_execute($stmt);
 }
 
 function getCustID() {
     global $db;
 
-    $username = 'charlie';
+    $username = $_COOKIE['loginName'];
 
     $sql = "SELECT id, username FROM member WHERE username = ? LIMIT 1";
 
@@ -224,5 +224,22 @@ function getOrderID() {
     } else {
         return $maxID + 1; // 否则返回 $maxID + 1
     }
+}
+
+function orderEvaluate($orderID, $merchantID, $custID) {
+    global $db;
+
+    $sql = "SELECT * FROM list WHERE orderID = ? AND merchantID = ? AND custID = ? AND status = '已完成'";
+
+    $stmt = mysqli_prepare($db, $sql);
+    mysqli_stmt_bind_param($stmt, "iii", $orderID, $merchantID, $custID);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    $rows = array();
+    while ($r = mysqli_fetch_assoc($result)) {
+        $rows[] = $r;
+    }
+    return $rows;
 }
 ?>
