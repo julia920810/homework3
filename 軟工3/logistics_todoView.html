@@ -124,10 +124,10 @@
 	
 	</div>
 	
-	<script>
-	function navigateTo(page) {
+<script>
+function navigateTo(page) {
 		window.location.href = page;
-	}
+	}	
 	const todoApp = Vue.createApp({
 		data() {
 			return {
@@ -147,7 +147,7 @@
 				that.list = myJson;
 				
 			});
-		},
+			},
 			Notdelivered: function() {
 			const that = this;
 			fetch('logistics_todoControl.php?act=Notdelivered')
@@ -159,7 +159,7 @@
 				that.list = myJson;
 				
 			});
-		},
+			},
 	
 		   
 			setEditshipping: function(status) {//更改為已寄送
@@ -206,15 +206,16 @@
 				this.UI=page;
 				this.Notdelivered();
 			},
-		},
-		logout: function() {
+			logout: function() {
 			navigateTo("loginTest.nocookie.html");
+			},
 		},
+		
 		created() {
 			this.shipping();
 			
 		}
 	}).mount("#main");
-	</script>
+</script>
 	
-	</body></html>
+</body></html>
