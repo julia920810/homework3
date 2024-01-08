@@ -190,13 +190,20 @@
 				let url = "merchant_todoControl.php?act=listproduct&merchantID=" + this.custID;
 
 				fetch(url)
-					.then(function(response) {
-						return response.json();
-					})
-					.then(function(myJson) {
-						console.log(myJson);
-						that.dat = myJson;
-					});
+				.then(function(response) {
+            		return response.text();  // 将响应的数据转换为文本
+        		})
+        		.then(function(data) {
+            		// 输出解析前的数据
+            		console.log('Received data:', data);
+           		 	// 选择解析后的 JSON 数组部分
+            		const jsonArray = JSON.parse(data.substring(data.indexOf('[')));
+            		console.log(jsonArray); // 输出解析后的 JSON 数据
+            		that.dat = jsonArray;
+        		})
+        		.catch(function(error) {
+            		console.error('Error during JSON parsing:', error);
+        		});
 			},
 
 	
