@@ -107,7 +107,7 @@
             <input v-model="product.quantity" type="number" :id="'quantity' + product.id" name="quantity" min="0" max="99">
           </td>
           <!-- 加入購物車 confirmAddToCart跳出window確定選取 -->
-          <td><button @click="confirmAddToCart(product.id, product.quantity)">加入購物車</button></td>
+          <td><button @click="confirmAddToCart(product.id, product.quantity, product.merchantID)">加入購物車</button></td>
         </tr>
       </table>
     </div>
@@ -356,12 +356,13 @@
             that.checkCart();
           });
         },
-        addCart(id, quantity, custID) {
+        addCart(id, quantity, custID, merchantID) {
           const that = this;
           const requestData = {
               id: id,
               quantity: quantity,
               custID: custID,
+              merchantID: merchantID,
           };
 
           fetch('client_todoControl.php?act=addCart&custID=' + custID, {
@@ -396,10 +397,10 @@
               console.error('Error during JSON parsing:', error);
           });
         },
-        confirmAddToCart(id, quantity) {
+        confirmAddToCart(id, quantity, merchantID) {
           const isConfirmed = window.confirm('確定要將商品加入購物車嗎？');
           if (isConfirmed) {
-            this.addCart(id, quantity, this.custID); // 將 custID 傳遞給 addCart
+            this.addCart(id, quantity, this.custID, merchantID); // 將 custID 傳遞給 addCart
           }
         },
         confirmDelToCart(id) {

@@ -19,6 +19,7 @@ switch ($act) {
         $id = isset($requestData['id']) ? (int)$requestData['id'] : 0;
         $quantity = isset($requestData['quantity']) ? (int)$requestData['quantity'] : 0;
         $custID = isset($requestData['custID']) ? (int)$requestData['custID'] : 0;
+        $merchantID = isset($requestData['merchantID']) ? (int)$requestData['merchantID'] : 0;
         echo "id: " . $id;
         echo "quantity: " . $quantity;
         echo "custID: " . $custID;
@@ -26,7 +27,7 @@ switch ($act) {
         // 不再使用此行：$custID = isset($requestData['custID']) ? (int)$requestData['custID'] : 0;
         
         if ($id > 0 && $quantity > 0) {
-            addCart($id, $quantity, $custID);
+            addCart($id, $quantity, $custID, $merchantID);
             // 不再使用此行：addCart($id, $quantity, $custID);
             // addCart($id, $quantity, $_SESSION['custID']); // 使用 session 中的 custID
         }

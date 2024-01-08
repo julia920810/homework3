@@ -31,21 +31,21 @@
 	</div>
 	<!--客戶的注冊頁面 ui -->
 	<div id="list" v-if="UI=='CregistForm'">
-		<h1>這是客戶的注冊頁面.請輸入username和passward</h1>
+		<h1>這是客戶的註冊頁面.請輸入username和passward</h1>
 		<hr/>
 		username: <input type="text"  v-model="clientdata.username"/> <br/>
 		Password: <input type="text" v-model="clientdata.password" />
-		<input type='button' @click="register()" value="注冊"/> <br/>
+		<input type='button' @click="register()" value="註冊"/> <br/>
 		<input type='button' @click="logout()" value="回到登入頁面"/>	
 	</div>
 	
 	<!--商家的注冊頁面 ui -->
 	<div id="list" v-if="UI=='MregistForm'">
-		<h1>這是商家的注冊頁面.請輸入username和passward</h1>
+		<h1>這是商家的註冊頁面.請輸入username和passward</h1>
 		<hr/>
 		username: <input type="text"  v-model="merchantdata.username"/> <br/>
 		Password: <input type="text" v-model="merchantdata.password" />
-		<input type='button' @click="Mregister()" value="注冊"/> <br/>
+		<input type='button' @click="Mregister()" value="註冊"/> <br/>
 		<input type='button' @click="logout()" value="回到登入頁面"/>	
 	</div>
 	
@@ -56,8 +56,8 @@
 		username: <input type="text"  v-model="username"/> <br/>
 		Password: <input type="text" v-model="password" />
 		<input type='button' @click="login()" value="login"/> <br/>
-		<input type='button' @click="jumptoregist()" value="客戶注冊"/> <br/>
-		<input type='button' @click="jumptoMregist()" value="商家注冊"/> <br/>
+		<input type='button' @click="jumptoregist()" value="客戶註冊"/> <br/>
+		<input type='button' @click="jumptoMregist()" value="商家註冊"/> <br/>
 	</div>
 		<hr/>
 		{{info}}

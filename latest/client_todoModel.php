@@ -45,7 +45,7 @@ function getOrderList($custID) {
     return $rows;
 }
 
-function addCart($id, $quantity, $custID) {
+function addCart($id, $quantity, $custID, $merchantID) {
     global $db;
 
     // 驗證 $id、$quantity 和 $custID 是否有效
@@ -88,9 +88,9 @@ function addCart($id, $quantity, $custID) {
         $result = mysqli_stmt_execute($update_stmt);
     } else {
         // 新增商品到購物車
-        $insert_sql = "INSERT INTO cart (id, name, price, quantity, custID) VALUES (?, ?, ?, ?, ?)";
+        $insert_sql = "INSERT INTO cart (id, name, price, quantity, custID, merchantID) VALUES (?, ?, ?, ?, ?, ?)";
         $insert_stmt = mysqli_prepare($db, $insert_sql);
-        mysqli_stmt_bind_param($insert_stmt, "ssdii", $id, $productName, $productPrice, $quantity, $custID);
+        mysqli_stmt_bind_param($insert_stmt, "ssdiii", $id, $productName, $productPrice, $quantity, $custID, $merchantID);
         $result = mysqli_stmt_execute($insert_stmt);
     }
 
