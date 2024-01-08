@@ -4,76 +4,67 @@
 	
 	  <style>
 		body {
-		  font-family: Arial, sans-serif;
-		  background-color: #f4f4f4;
-		  margin: 0;
-		  padding: 0;
-		}
-	
-		#main {
-		  max-width: 800px;
-		  margin: 20px auto;
-		  background-color: #fff;
-		  padding: 20px;
-		  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-		}
-	
-		h1 {
-		  color: #333;
-		}
-	
-		p {
-		  color: #777;
-		}
-	
-		button {
-		  background-color: #4caf50;
-		  color: #fff;
-		  border: none;
-		  padding: 15px 15px;
-		  cursor: pointer;
-		  border-radius: 5px;
-		  margin-right: 5px;
-		}
-	
-		table {
-		  width: 100%;
-		  border-collapse: collapse;
-		  margin-top: 20px;
-		}
-	
-		th, td {
-		  border: 1px solid #ddd;
-		  padding: 10px;
-		  text-align: center;
-		}
-	
-		th {
-		  background-color: #4caf50;
-		  color: #fff;
-		}
-	
-		tr:nth-child(even) {
-		  background-color: #f9f9f9;
-		}
-	
-		input {
-		  width: 100px;
-		  padding: 5px;
-		  box-sizing: border-box;
-		  text-align: center;
-		}
-	
-		select {
-		  padding: 5px;
-		  box-sizing: border-box;
-		}
-	
-		.topbar{
-		  float: right;
-		  margin-bottom: 20px;
-		}
-	
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    #merchForm {
+      max-width: 800px;
+      margin: 20px auto;
+      background-color: #fff;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    p {
+      color: #777;
+    }
+
+    button {
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-right: 5px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #4caf50;
+      color: #fff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    input {
+      width: 100px;
+      padding: 5px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    
 	
 	  </style>
 	</head>
@@ -185,7 +176,7 @@
 			}
 		},
 		methods: {
-			loadList: function() {
+			loadList: function() {//列出商品清單
 				const that = this;
 				let url = "merchant_todoControl.php?act=listproduct&merchantID=" + this.custID;
 
@@ -207,7 +198,7 @@
 			},
 
 	
-			delproduct:function (id) {
+			delproduct:function (id) {//刪除商品
 				const that = this;
 				let url="merchant_todoControl.php?act=delproduct&id="+id;
 				fetch(url,{
@@ -221,7 +212,7 @@
 	
 			},
 	
-			addproduct :function() {
+			addproduct :function() {//新增商品
 				const that=this;
 				let mydat = new FormData();
 				mydat.append( "dat", JSON.stringify(this.newProducts) );
@@ -235,7 +226,7 @@
 				.then(function(data){ 
 					console.log(data);
 					that.setUI2('merchForm');
-					that.loadList();
+					that.loadList();//列出商品清單
 				})
 			},
 			updateproduct :function() {
@@ -252,7 +243,7 @@
 				.then(function(data){ 
 					console.log(data);
 					that.setUI2('merchForm');
-					that.loadList();
+					that.loadList();//列出商品清單
 				})
 			},
 			Notprocessed: function () { //未處理清單瀏覽
@@ -291,11 +282,11 @@
             		console.error('Error during JSON parsing:', error);
         		});
 			},
-			setEditUI: function(products) {
+			setEditUI: function(products) {//更改商品資訊UI
 				this.newProducts=products;
 				this.setUI2('editForm2');
 			},
-			setAddUI: function() {
+			setAddUI: function() {//新增商品UI
 				this.newProducts={
 					id: -1,
 					name: '',
@@ -304,11 +295,11 @@
 				};
 				this.setUI2('editForm');
 			},
-			setUINotprocessed: function(page) {
+			setUINotprocessed: function(page) {//列出未處理清單
 				this.UI=page;
 				this.Notprocessed();
 			},
-			setUIprocessing: function(page) {
+			setUIprocessing: function(page) {//列出處理中清單
 				this.UI=page;
 				this.processing();
 			},
@@ -316,7 +307,7 @@
 				this.UI=page;
 				this.loadList();
 			},
-			setEditUINotprocessed: function(status) {
+			setEditUINotprocessed: function(status) {//更改為處理中
 				const that=this;
 				let mydat = new FormData();
 	
@@ -332,7 +323,7 @@
 				that.Notprocessed();
 				});
 			},
-			setEditUIprocessing: function(status) {
+			setEditUIprocessing: function(status) {//更改為寄送中
 				const that=this;
 				let mydat = new FormData();
 	
@@ -348,10 +339,10 @@
 				that.processing();
 				});
 			},
-			logout: function() {
+			logout: function() {//登出
 				navigateTo("loginTest.nocookie.html");
 			},
-			async fetchCustID() {
+			async fetchCustID() {//取的id username
 			  try {
 				  const response = await fetch('merchant_todoControl.php?act=getCustID');
 				  if (response.ok) {
@@ -378,7 +369,7 @@
 			this.loadList();
 			
 			console.log('Created - custID:', this.custID);
-			},
+		},
 	}).mount("#merchForm");
 	</script>
 	

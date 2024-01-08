@@ -14,7 +14,7 @@ function shipping() {//列出寄送中清單
     return $rows;
 }
 
-function Notdelivered() {
+function Notdelivered() {//列出已寄送清單
     global $db;
     $sql = "select * from list where status='已寄送';";
     $stmt = mysqli_prepare($db, $sql);
@@ -27,7 +27,7 @@ function Notdelivered() {
     return $rows;
 }
 
-function updatestatus($id) {
+function updatestatus($id) {//改成已寄送
 	global $db;
     
 	$sql = "update list set status='已寄送' where id=?"; //SQL中的 ? 代表未來要用變數綁定進去的地方
@@ -37,7 +37,7 @@ function updatestatus($id) {
 	return True;
 }
 
-function updatestatus2($id) {
+function updatestatus2($id) {//改成已送達
 	global $db;
     
 	$sql = "update list set status='已送達' where id=?"; //SQL中的 ? 代表未來要用變數綁定進去的地方

@@ -133,7 +133,7 @@ function navigateTo(page) {
 			}
 		},
 		methods: {
-			shipping: function() {
+			shipping: function() {//列出寄送中清單
 			const that = this;
 			fetch('logistics_todoControl.php?act=shipping')
 			.then(function(response) {
@@ -144,7 +144,7 @@ function navigateTo(page) {
 				
 			});
 			},
-			Notdelivered: function() {
+			Notdelivered: function() {//列出已寄送清單
 			const that = this;
 			fetch('logistics_todoControl.php?act=Notdelivered')
 				.then(function(response) {
@@ -202,7 +202,7 @@ function navigateTo(page) {
 				this.UI=page;
 				this.Notdelivered();
 			},
-			logout: function() {
+			logout: function() {//登出
 			navigateTo("loginTest.nocookie.html");
 			},
 		},
