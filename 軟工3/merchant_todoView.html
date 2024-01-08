@@ -1,32 +1,80 @@
 <html><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="https://unpkg.com/vue@3.0.11"></script>
+
   <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
     #main {
-            max-width: 800px;
-            margin: 0 auto;
-        }
+      max-width: 800px;
+      margin: 20px auto;
+      background-color: #fff;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
 
-        h1 {
-            text-align: center;
-        }
+    h1 {
+      color: #333;
+    }
 
-        button {
-            margin-bottom: 10px;
-        }
+    p {
+      color: #777;
+    }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
+    button {
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      padding: 15px 15px;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-right: 5px;
+    }
 
-        th,
-        td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #4caf50;
+      color: #fff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    input {
+      width: 100px;
+      padding: 5px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    select {
+      padding: 5px;
+      box-sizing: border-box;
+    }
+
+    .topbar{
+      float: right;
+      margin-bottom: 20px;
+    }
+
+
   </style>
 </head>
 
@@ -35,8 +83,8 @@
 
 <div id = "merchForm">
 	<h1>商家</h1>
-	<p>商家您好，custID = {{id}}, username = {{username}}</p>
-	<input type='button' @click="logout()" value="logout"/>	
+	<p>商家您好，custID = {{custID}}, username = {{username}}</p>
+	<input type='button' @click="logout()" value="登出"/>	
 	<hr />
 	<div id="merchForm" v-if="UI=='merchForm'">
 		<h1>商品清單</h1>
@@ -44,7 +92,7 @@
 		<button @click="setUINotprocessed('Notprocessed')">查看未處理訂單</button>
 		<button @click="setUIprocessing('processing')">查看處理中訂單</button>
 		<table border=1>
-			<tr><td>序號</td><td>商家序號</td><td>商品名稱</td><td>商品介紹</td><td>商品價格</td><td>功能</td></tr>
+			<tr><td>序號</td><td>商家編號</td><td>商品名稱</td><td>商品介紹</td><td>商品價格</td><td>功能</td></tr>
 			<tr v-for="products in dat">
 				<td>{{products.id}}</td>
 				<td>{{products.merchantID}}</td>
@@ -62,7 +110,7 @@
 		<button @click="setUI2('merchForm')">返回商品介面</button>
 		<button @click="setUIprocessing('processing')">查看處理中訂單</button>
 		<table border=1>
-			<tr><td>序號</td><td>顧客序號</td><td>商家序號</td><td>訂單序號</td><td>商品名稱</td><td>商品數量</td><td>商品價格</td><td>狀態</td><td>-</td></tr>
+			<tr><td>編號</td><td>顧客編號</td><td>商家編號</td><td>訂單編號</td><td>商品名稱</td><td>商品數量</td><td>商品價格</td><td>狀態</td><td>-</td></tr>
 			<tr v-for="status in list">
 				<td>{{status.id}}</td>
 				<td>{{status.custID}}</td>
@@ -81,7 +129,7 @@
 		<button @click="setUI2('merchForm')">返回商品介面</button>
 		<button @click="setUINotprocessed('Notprocessed')">查看未處理訂單</button>
 		<table border=1>
-			<tr><td>序號</td><td>顧客序號</td><td>商家序號</td><td>訂單序號</td><td>商品名稱</td><td>商品數量</td><td>商品價格</td><td>狀態</td><td>-</td></tr>
+			<tr><td>編號</td><td>顧客編號</td><td>商家編號</td><td>訂單編號</td><td>商品名稱</td><td>商品數量</td><td>商品價格</td><td>狀態</td><td>-</td></tr>
 			<tr v-for="status in list">
 				<td>{{status.id}}</td>
 				<td>{{status.custID}}</td>
@@ -129,8 +177,8 @@ const todoApp = Vue.createApp({
 				illustrate:'',
 				price:''
 			},
-            id:'',
-			username:'',
+            custID: null,
+			username:null,
             
 			
 		}
@@ -139,7 +187,7 @@ const todoApp = Vue.createApp({
 		loadList: function() {
 			const that = this; //this  ==> stands for vm6. let's save `this` to `that`
 		//向URL發出request
-			fetch("merchant_todoControl.php?act=listproduct&merchantID="+this.id)
+			fetch("merchant_todoControl.php?act=listproduct&merchantID="+this.custID)
 
 			.then(function(response) {
 				return response.json();
@@ -172,7 +220,7 @@ const todoApp = Vue.createApp({
 			let mydat = new FormData();
 			mydat.append( "dat", JSON.stringify(this.newProducts) );
 
-			let url="merchant_todoControl.php?act=addproduct&merchantID="+this.id;
+			let url="merchant_todoControl.php?act=addproduct&merchantID="+this.custID;
 			fetch(url,{
 				method: 'POST',
 				body: mydat // 將表單物件放入fetch的body屬性
@@ -203,7 +251,7 @@ const todoApp = Vue.createApp({
 		},
 		Notprocessed: function () { //未處理清單瀏覽
 			const that = this;
-			fetch("merchant_todoControl.php?act=Notprocessed&merchantID="+this.id) // --> 
+			fetch("merchant_todoControl.php?act=Notprocessed&merchantID="+this.custID) // --> 
 			.then(function(response) {
 			return response.json();
 			})
@@ -214,7 +262,7 @@ const todoApp = Vue.createApp({
         },
 	    processing: function () { //處理中清單瀏覽
 			const that = this;
-			fetch("merchant_todoControl.php?act=processing&merchantID="+this.id) // --> 
+			fetch("merchant_todoControl.php?act=processing&merchantID="+this.custID) // --> 
 			.then(function(response) {
 			return response.json();
 			})
@@ -305,11 +353,11 @@ const todoApp = Vue.createApp({
 
 
 	},
-	created() {
-		this.loadList();
-
-    
-	}
+	async created() {
+        this.loadList();
+		await this.fetchCustID();
+        console.log('Created - custID:', this.custID);
+        },
 }).mount("#merchForm");
 </script>
 
