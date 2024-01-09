@@ -166,12 +166,12 @@ function clearCart($custID) {
     mysqli_stmt_execute($stmt);
 }
 
-function submitEvaluation($evaluation, $orderID, $merchantID, $custID) {
+function submitEvaluation($orderID,$evaluation) {
     global $db;
 
-    $update_sql = "UPDATE `list` SET evaluate = ? WHERE orderID = ? AND merchantID = ? AND custID = ? AND status = '已完成'";
+    $update_sql = "UPDATE `list` SET evaluate = ? WHERE id = ? AND status = '已完成'";
     $stmt = mysqli_prepare($db, $update_sql);
-    mysqli_stmt_bind_param($stmt, "iiii", $evaluation, $orderID, $merchantID, $custID);
+    mysqli_stmt_bind_param($stmt, "ii", $evaluation, $orderID);
     mysqli_stmt_execute($stmt);
 }
 
@@ -226,13 +226,13 @@ function getOrderID() {
     }
 }
 
-function orderEvaluate($orderID, $merchantID, $custID) {
+function orderEvaluate($orderID) {
     global $db;
 
-    $sql = "SELECT * FROM list WHERE orderID = ? AND merchantID = ? AND custID = ? AND status = '已完成'";
+    $sql = "SELECT * FROM list WHERE id = ?  AND status = '已完成'";
 
     $stmt = mysqli_prepare($db, $sql);
-    mysqli_stmt_bind_param($stmt, "iii", $orderID, $merchantID, $custID);
+    mysqli_stmt_bind_param($stmt, "i", $orderID);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
 

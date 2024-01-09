@@ -152,10 +152,11 @@
       </div>
       <table border=1>
         <tr>
-          <td>訂單編號</td><td>客戶編號</td><td>商家編號</td><td>商品名稱</td><td>數量</td><td>金額</td><td>狀態</td><td>對商家滿意度</td><td>-</td><td>-</td>
+          <td>編號</td><td>訂單編號</td><td>客戶編號</td><td>商家編號</td><td>商品名稱</td><td>數量</td><td>金額</td><td>狀態</td><td>對商家滿意度</td><td>-</td><td>-</td>
         </tr>
         <!-- array : orders -->
         <tr v-for="order in orders"> 
+          <td>{{order.id}}</td>
           <td>{{order.OrderID}}</td>
           <td>{{order.custID}}</td>
           <td>{{order.merchantID}}</td>
@@ -178,15 +179,16 @@
           </td>
           <!-- 提交評價按鈕 -->
           <td>
-            <button @click="orderEvaluate(order.OrderID, order.merchantID); setUI('orderEvaluate')">評分</button>
+            <button @click="orderEvaluate(order.id); setUI('orderEvaluate')">評分</button>
           </td>
           <!-- 新增完成訂單的按鈕 -->
           <!-- 完成訂單按鈕 -->
-          <td>
+          <td v-if="order.status ==='已送達'"><!-- 狀態是已送達時才會出現完成訂單的按鈕 -->
             <button
               :class="{ 'disabled-button': isButtonDisabled(order, 'complete') }"
               @click="confirmCompleteOrder(order.id)"
               :disabled="isButtonDisabled(order, 'complete')"
+
             >
               完成訂單
             </button>
@@ -203,10 +205,11 @@
       </div>
       <table border=1>
         <tr>
-          <td>訂單編號</td><td>客戶編號</td><td>商家編號</td><td>商品名稱</td><td>數量</td><td>金額</td><td>狀態</td><td>對商家滿意度</td><td>-</td>
+          <td>編號</td><td>訂單編號</td><td>客戶編號</td><td>商家編號</td><td>商品名稱</td><td>數量</td><td>金額</td><td>狀態</td><td>對商家滿意度</td><td>-</td>
         </tr>
         <!-- array : orders -->
         <tr v-for="order in ordersEvaluate"> 
+          <td>{{order.id}}</td>
           <td>{{order.OrderID}}</td>
           <td>{{order.custID}}</td>
           <td>{{order.merchantID}}</td>
@@ -237,7 +240,7 @@
           <td>
             <button
               :class="{ 'disabled-button': isButtonDisabled(order, 'evaluate') }"
-              @click="confirmSubmitEvaluation(order.id, order.OrderID, order.merchantID); setUI('main')"
+              @click="confirmSubmitEvaluation(order.id); setUI('main')"
               :disabled="isButtonDisabled(order, 'evaluate')"
             >
               提交
@@ -379,23 +382,23 @@
               that.checkCart();
           });
         },
-        orderEvaluate(orderID, merchantID){
+        orderEvaluate(orderID){
           const that = this;
-          fetch('client_todoControl.php?act=orderEvaluate&custID=' + this.custID + '&orderID=' + orderID + '&merchantID=' + merchantID)
+          fetch('client_todoControl.php?act=orderEvaluate&id=' + orderID)
           .then(function(response) {
             return response.text();
-                    })
-          .then(function(data) {
-              console.log(data); // 输出错误前的数据
-              return JSON.parse(data);
-          })
-          .then(function(myJson) {
-              console.log(myJson); // 输出解析后的 JSON 数据
-              that.ordersEvaluate = myJson;
-          })
-          .catch(function(error) {
-              console.error('Error during JSON parsing:', error);
-          });
+            })
+				  .then(function(data) {
+            		// 输出解析前的数据
+            		console.log('Received data:', data);
+           		 	// 选择解析后的 JSON 数组部分
+            		const jsonArray = JSON.parse(data.substring(data.indexOf('[')));
+            		console.log(jsonArray); // 输出解析后的 JSON 数据
+            		that.ordersEvaluate = jsonArray;
+        		})
+        		.catch(function(error) {
+            		console.error('Error during JSON parsing:', error);
+        		});
         },
         confirmAddToCart(id, quantity, merchantID) {
           const isConfirmed = window.confirm('確定要將商品加入購物車嗎？');
@@ -415,10 +418,10 @@
             this.checkList(); 
           }
         },
-        confirmSubmitEvaluation(orderId, OrderID, merchantID) {
+        confirmSubmitEvaluation(orderId) {
           const isConfirmed = window.confirm('確定要提交評價嗎？');
           if (isConfirmed) {
-            this.submitEvaluation(orderId, OrderID, merchantID, this.selectedEvaluation);
+            this.submitEvaluation(orderId, this.selectedEvaluation);
           }
         },
         confirmCompleteOrder(orderId) {
@@ -454,7 +457,7 @@
         logout: function() {
 				  navigateTo("loginTest.nocookie.html");
 			  },
-        async submitEvaluation(orderId, OrderID, merchantID) {
+        async submitEvaluation(orderId) {
           const that = this;
           const evaluation = that.orderEvaluations[orderId];
 
@@ -464,7 +467,7 @@
           };
 
           try {
-            const response = await fetch('client_todoControl.php?act=submitEvaluation&orderId=' + orderId + '&evaluation=' + evaluation + '&OrderID=' + OrderID + '&merchantID=' + merchantID, {
+            const response = await fetch('client_todoControl.php?act=submitEvaluation&orderId=' + orderId + '&evaluation=' + evaluation, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',

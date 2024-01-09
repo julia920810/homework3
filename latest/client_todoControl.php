@@ -46,11 +46,9 @@ switch ($act) {
     case "submitEvaluation":
         $orderId = isset($_REQUEST['orderId']) ? (int)$_REQUEST['orderId'] : 0;
         $evaluation = isset($_REQUEST['evaluation']) ? (int)$_REQUEST['evaluation'] : 0;
-        $OrderID = (int)$_REQUEST['OrderID'];
-        $merchantID = (int)$_REQUEST['merchantID'];
-
+    
         if ($orderId > 0 && $evaluation > 0 && $evaluation <= 5) {
-            submitEvaluation($evaluation, $OrderID, $merchantID, $custID);
+            submitEvaluation($orderId, $evaluation);
             echo "評價提交成功";
         } else {
             echo "無效的評價參數";
@@ -67,10 +65,8 @@ switch ($act) {
         }
         return;
     case "orderEvaluate":
-        $orderID = (int)$_REQUEST['orderID'];
-        $merchantID = (int)$_REQUEST['merchantID'];
-        $custID = (int)$_REQUEST['custID'];
-        $orders = orderEvaluate($orderID, $merchantID, $custID);
+        $orderID = (int)$_REQUEST['id'];
+        $orders = orderEvaluate($orderID);
         echo json_encode($orders);
         return;
 
